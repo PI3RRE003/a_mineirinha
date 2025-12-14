@@ -72,8 +72,19 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  adapter: postgresql
-  encoding: unicode
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  url: <%= ENV["DATABASE_URL"] %>
+  primary: &primary_production
+    <<: *default
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    url: <%= ENV["DATABASE_URL"] %>
+  
+  # Aqui está o segredo: Dizemos para o Cable, Cache e Queue usarem o 'primary'
+  cable:
+    <<: *primary_production
+  
+  cache:
+    <<: *primary_production
+  
+  queue:
+    <<: *primary_production
