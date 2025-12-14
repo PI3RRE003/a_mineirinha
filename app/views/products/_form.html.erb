@@ -1,0 +1,71 @@
+<%= form_with(model: product, class: "contents") do |form| %>
+  <% if product.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3 border border-red-200">
+      <h2><%= pluralize(product.errors.count, "erro") %> impediu(ram) este produto de ser salvo:</h2>
+
+      <ul class="list-disc ml-6">
+        <% product.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :nome, class: "font-medium text-gray-700" %>
+    <%# Mudança: focus agora é laranja (orange-500) para lembrar a cor do pão de queijo %>
+    <%= form.text_field :nome, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full focus:ring-2 focus:ring-offset-1 transition-colors", {"border-gray-300 focus:outline-none focus:border-orange-500 focus:ring-orange-500": product.errors[:nome].none?, "border-red-400 focus:outline-red-600": product.errors[:nome].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :descricao, "Descrição", class: "font-medium text-gray-700" %>
+    <%= form.text_area :descricao, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full focus:ring-2 focus:ring-offset-1 transition-colors", {"border-gray-300 focus:outline-none focus:border-orange-500 focus:ring-orange-500": product.errors[:descricao].none?, "border-red-400 focus:outline-red-600": product.errors[:descricao].any?}] %>
+  </div>
+
+  <%# --- CAMPO DE IMAGEM --- %>
+  <div class="my-6">
+    <%= form.label :imagem, "Foto do Produto", class: "block font-medium text-stone-700 mb-2" %>
+
+    <%# Mostra um preview se já existir uma imagem (na edição) %>
+    <% if product.imagem.attached? && product.imagem.persisted? %>
+      <div class="mb-3 p-2 bg-stone-50 border border-stone-100 rounded-xl inline-block">
+        <%= image_tag product.imagem.variant(resize_to_limit: [150, 150]), class: "h-32 w-32 object-cover rounded-lg border border-orange-200 shadow-sm" %>
+        <p class="text-xs text-stone-500 mt-1 text-center">Imagem Atual</p>
+      </div>
+    <% end %>
+
+    <%# O campo de input estilizado com Tailwind %>
+    <%= form.file_field :imagem, class: "block w-full text-sm text-stone-500
+      file:mr-4 file:py-2.5 file:px-6
+      file:rounded-full file:border-0
+      file:text-sm file:font-bold
+      file:bg-orange-50 file:text-orange-700
+      file:cursor-pointer file:transition-colors
+      hover:file:bg-orange-100
+      cursor-pointer rounded-lg border border-stone-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500
+    " %>
+    <p class="mt-1 text-xs text-stone-400">Formatos aceitos: JPG, PNG. Máximo 5MB.</p>
+  </div>
+<%# ----------------------- %>
+
+  <div class="my-5">
+    <%= form.label :preco, "Preço (R$)", class: "font-medium text-gray-700" %>
+    <%= form.text_field :preco, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full focus:ring-2 focus:ring-offset-1 transition-colors", {"border-gray-300 focus:outline-none focus:border-orange-500 focus:ring-orange-500": product.errors[:preco].none?, "border-red-400 focus:outline-red-600": product.errors[:preco].any?}] %>
+  </div>
+
+  <div class="my-5 flex items-center gap-2">
+    <%# O helper correto do Rails é check_box (com underline) %>
+    <%= form.check_box :disponivel, class: ["block shadow-sm rounded text-orange-600 focus:ring-orange-500 border-gray-300 h-5 w-5 cursor-pointer", {"border-gray-300": product.errors[:disponivel].none?, "border-red-400": product.errors[:disponivel].any?}] %>
+    <%= form.label :disponivel, "Produto Disponível?", class: "font-medium text-gray-700 cursor-pointer select-none" %>
+  </div>
+
+  <div class="mt-4 mb-4 flex items-center gap-3 bg-orange-50 p-4 rounded-xl border border-[#32491E]">
+    <%= form.check_box :gera_pontos, class: "w-6 h-6 text-[#32491E] border-stone-300 rounded focus:ring-[#32491E]" %>
+    <%= form.label :gera_pontos, "Este produto gera Ponto de Fidelidade? 🧀", class: "font-bold text-[#32491E] cursor-pointer" %>
+  </div>
+
+  <div class="inline">
+    <%# Botão principal em Laranja forte, escurecendo ao passar o mouse %>
+    <%= form.submit "Salvar Produto", class: "w-full sm:w-auto rounded-md px-4 py-2.5 bg-[#32491E] hover:bg-amber-100 text-amber-100 hover:text-[#32491E] font-bold tracking-wide shadow-sm hover:shadow-md cursor-pointer transition-all duration-200" %>
+  </div>
+<% end %>

@@ -1,0 +1,132 @@
+<div 
+  class="fixed inset-0 -z-10 bg-repeat"
+  style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px;"
+>
+</div>
+
+<%# Ajuste: py-6 no mobile, py-12 no desktop %>
+<div class="w-full flex items-center justify-center py-6 md:py-12 px-4 sm:px-6 lg:px-8 font-sans">
+  
+  <div class="max-w-2xl w-full space-y-6">
+    
+    <%# Ajuste: rounded-3xl no mobile, rounded-[40px] no desktop %>
+    <div class="bg-amber-100 rounded-3xl md:rounded-[40px] shadow-2xl border-4 border-white overflow-hidden">
+
+      <%# Botão Voltar %>
+      <div class="pt-6 pl-6 md:pt-4 md:pl-2">
+        <%= link_to :back, class: "inline-flex items-center text-[#32491E] hover:text-orange-600 font-bold transition md:ml-2" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Voltar
+        <% end %>
+      </div>
+
+      <%# Cabeçalho do Card %>
+      <div class="px-6 py-6 md:px-8 border-b border-orange-200/50 bg-amber-50/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-[#32491E] text-center">Editar Meus Dados 🧀</h2>
+        <p class="mt-2 text-center text-sm md:text-base text-stone-600">Mantenha suas informações de entrega sempre atualizadas.</p>
+      </div>
+
+      <%# Corpo do Formulário %>
+      <div class="px-6 py-6 md:px-8 md:py-8">
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-8" }) do |f| %>
+          
+          <%= render "devise/shared/error_messages", resource: resource %>
+
+          <%# SEÇÃO 1: DADOS PESSOAIS %>
+          <div>
+            <h3 class="text-lg font-bold text-[#32491E] mb-4 flex items-center gap-2">
+              <span class="bg-[#32491E] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shrink-0">1</span>
+              Quem é você?
+            </h3>
+            
+            <%# Grid responsivo: 1 coluna mobile, 2 colunas desktop %>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div>
+                <%= f.label :nome, "Seu Nome Completo", class: "block text-sm font-medium text-stone-700 mb-1 pl-1" %>
+                <%= f.text_field :nome, class: "w-full rounded-2xl border-stone-200 bg-white px-4 py-3 text-stone-700 focus:border-[#32491E] focus:ring-[#32491E] shadow-sm transition placeholder-stone-400", placeholder: "Ex: Maria da Silva" %>
+              </div>
+
+              <div>
+                <%= f.label :telefone, "Telefone / WhatsApp", class: "block text-sm font-medium text-stone-700 mb-1 pl-1" %>
+                <%= f.text_field :telefone, class: "w-full rounded-2xl border-stone-200 bg-white px-4 py-3 text-stone-700 focus:border-[#32491E] focus:ring-[#32491E] shadow-sm transition placeholder-stone-400", placeholder: "(XX) 99999-9999" %>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <%= f.label :email, class: "block text-sm font-medium text-stone-700 mb-1 pl-1" %>
+              <%= f.email_field :email, autocomplete: "email", class: "w-full rounded-2xl border-stone-200 bg-white px-4 py-3 text-stone-700 focus:border-[#32491E] focus:ring-[#32491E] shadow-sm transition" %>
+            </div>
+
+            <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+              <div class="mt-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-200">
+                Aguardando confirmação para: <%= resource.unconfirmed_email %>
+              </div>
+            <% end %>
+          </div>
+
+          <%# SEÇÃO 2: ENDEREÇO %>
+          <div class="pt-2">
+            <h3 class="text-lg font-bold text-[#32491E] mb-4 flex items-center gap-2">
+              <span class="bg-[#32491E] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shrink-0">2</span>
+              Onde entregamos?
+            </h3>
+            
+            <div>
+              <%= f.label :endereco, "Endereço Completo", class: "block text-sm font-medium text-stone-700 mb-1 pl-1" %>
+              <%= f.text_area :endereco, rows: 3, class: "w-full rounded-2xl border-stone-200 bg-white px-4 py-3 text-stone-700 focus:border-[#32491E] focus:ring-[#32491E] shadow-sm transition placeholder-stone-400 resize-none", placeholder: "Rua, Número, Bairro, Complemento e Cidade" %>
+              <p class="text-xs text-stone-500 mt-2 pl-1">Isso ajuda nosso entregador a chegar quentinho até você.</p>
+            </div>
+          </div>
+
+          <%# SEÇÃO 3: TROCAR SENHA %>
+          <div class="bg-white/60 p-5 md:p-6 rounded-3xl border border-stone-200 shadow-inner">
+            <h3 class="text-lg font-bold text-[#32491E] mb-2 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+              </svg>
+              Trocar Senha (Opcional)
+            </h3>
+            <p class="text-xs text-stone-500 mb-4">Deixe em branco se não quiser mudar.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <%= f.label :password, "Nova Senha", class: "block text-xs font-bold text-stone-600 mb-1 pl-1" %>
+                <%= f.password_field :password, autocomplete: "new-password", class: "w-full rounded-xl border-stone-200 bg-white px-3 py-2 text-sm focus:ring-[#32491E]" %>
+                <% if @minimum_password_length %>
+                  <em class="text-xs text-stone-400 pl-1">(mínimo <%= @minimum_password_length %> caracteres)</em>
+                <% end %>
+              </div>
+
+              <div>
+                <%= f.label :password_confirmation, "Confirmar Nova Senha", class: "block text-xs font-bold text-stone-600 mb-1 pl-1" %>
+                <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "w-full rounded-xl border-stone-200 bg-white px-3 py-2 text-sm focus:ring-[#32491E]" %>
+              </div>
+            </div>
+          </div>
+
+          <%# CONFIRMAÇÃO COM SENHA ATUAL %>
+          <div class="pt-4 border-t border-stone-200/50">
+            <div class="bg-orange-50 border border-orange-200 rounded-2xl p-4 md:p-5">
+              <%= f.label :current_password, "Digite sua senha ATUAL para confirmar as mudanças", class: "block text-sm font-bold text-orange-800 mb-2" %>
+              <%= f.password_field :current_password, autocomplete: "current-password", class: "w-full rounded-xl border-orange-200 bg-white px-4 py-3 text-stone-700 focus:border-orange-500 focus:ring-orange-500 shadow-sm" %>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <%= f.button "Salvar Alterações", type: :submit, class: "w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg shadow-green-900/20 text-lg font-bold text-white bg-[#32491E] hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#32491E] transition transform hover:-translate-y-1 cursor-pointer active:scale-95" %>
+          </div>
+
+        <% end %>
+      </div>
+
+      <%# ZONA DE PERIGO (CANCELAR) %>
+      <div class="bg-stone-100 px-6 py-6 md:px-8 border-t border-stone-200 flex flex-col items-center justify-center gap-2">
+        <p class="text-stone-500 text-sm">Não está feliz conosco?</p>
+        <%= button_to "Cancelar minha conta", registration_path(resource_name), data: { confirm: "Tem certeza? Isso apagará todo seu histórico de queijos 😢", turbo_confirm: "Tem certeza? Isso apagará todo seu histórico de queijos 😢" }, method: :delete, class: "text-red-500 text-sm font-bold hover:text-red-700 hover:underline bg-transparent border-0 cursor-pointer transition" %>
+      </div>
+
+    </div>
+  </div>
+</div>

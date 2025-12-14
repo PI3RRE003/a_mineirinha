@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-stone-100 font-sans pb-20">
+  
+  <%# --- CABEÇALHO --- %>
+  <div class="bg-[#32491E] text-white py-4 px-4 md:px-6 shadow-xl sticky top-0 z-50 border-b-4 border-orange-500">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      
+      <%# Título e Ícone %>
+      <div class="flex items-center gap-3 md:gap-4 w-full md:w-auto">
+        <div class="bg-white/10 p-2 md:p-3 rounded-2xl backdrop-blur-sm shrink-0">
+          <span class="text-2xl md:text-3xl">👨‍🍳</span>
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
+            Painel da Cozinha
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+          </h1>
+          <p class="text-green-100/80 text-xs md:text-sm font-medium">Monitoramento em Tempo Real</p>
+        </div>
+      </div>
+      
+      <%# Botões de Ação %>
+      <%# Agora com 3 botões visíveis no mobile e desktop %>
+      <div class="flex items-center gap-2 md:gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+        
+        <%# 1. BOTÃO VOLTAR PARA LOJA (Novo) %>
+        <%= link_to root_path, class: "flex-1 md:flex-none justify-center flex items-center gap-2 bg-[#2a3e1a] hover:bg-[#223315] text-white px-4 py-2.5 rounded-xl font-bold transition shadow-md border border-[#3f572e] text-xs md:text-sm whitespace-nowrap" do %>
+          <span>🏪 Loja</span>
+        <% end %>
+        
+        <%# 2. BOTÃO HISTÓRICO %>
+        <%= link_to historico_vendas_path, class: "flex-1 md:flex-none justify-center flex items-center gap-2 bg-stone-800 hover:bg-stone-900 text-white px-4 py-2.5 rounded-xl font-bold transition shadow-md border border-stone-600 text-xs md:text-sm whitespace-nowrap" do %>
+          <span>📈 Histórico</span>
+        <% end %>
+
+        <%# 3. BOTÃO ATUALIZAR %>
+        <%= link_to cozinha_path, class: "flex-1 md:flex-none justify-center flex items-center gap-2 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white px-4 md:px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-orange-900/20 group text-xs md:text-sm whitespace-nowrap" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5 group-hover:rotate-180 transition-transform duration-500"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+          Atualizar
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# --- CONTEÚDO PRINCIPAL --- %>
+  <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+    
+    <% if @pedidos.empty? %>
+      <div class="flex flex-col items-center justify-center text-center py-20 md:py-24 opacity-60 animate-fade-in-up">
+        <div class="bg-white p-6 md:p-8 rounded-full shadow-sm mb-6">
+          <div class="text-5xl md:text-6xl grayscale">🔥</div>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-bold text-stone-600">O forno está vazio!</h2>
+        <p class="text-stone-500 text-base md:text-lg mt-2 max-w-md px-4">Não há pedidos pendentes no momento. Aproveite para organizar a bancada.</p>
+      </div>
+    <% else %>
+
+      <%# Grid Responsivo: 1 coluna (mobile), 2 (tablet), 3 (desktop) %>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+        <% @pedidos.each do |pedido| %>
+          
+          <div class="bg-white rounded-3xl shadow-sm border border-stone-200 overflow-hidden flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative group">
+            
+            <%# Barra Lateral Colorida %>
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 <%= pedido.status == 'Recebido' ? 'bg-orange-500' : 'bg-green-500' %>"></div>
+
+            <%# Cabeçalho do Card %>
+            <div class="p-4 md:p-5 pb-3 flex justify-between items-start pl-5 md:pl-6">
+              <div class="overflow-hidden">
+                <span class="inline-block px-2 py-0.5 rounded bg-stone-100 text-stone-500 text-[10px] font-black uppercase tracking-widest mb-1">
+                  Pedido #<%= pedido.id %>
+                </span>
+                <h3 class="font-bold text-lg md:text-xl text-stone-800 leading-none truncate w-full pr-2" title="<%= pedido.respond_to?(:cliente_nome) ? pedido.cliente_nome : '' %>">
+                   <%= pedido.respond_to?(:cliente_nome) && pedido.cliente_nome.present? ? pedido.cliente_nome : (pedido.user.try(:nome) || "Cliente ##{pedido.user_id}") %>
+                </h3>
+              </div>
+              
+              <div class="flex flex-col items-end shrink-0">
+                <div class="text-xs font-bold <%= pedido.status == 'Recebido' ? 'text-orange-600 animate-pulse' : 'text-green-600' %> flex items-center gap-1">
+                  <%= pedido.status == 'Recebido' ? '🔥' : '👨‍🍳' %> <%= pedido.status %>
+                </div>
+                <span class="text-[10px] text-stone-400 font-medium mt-1 bg-stone-50 px-1.5 py-0.5 rounded">
+                  <%= time_ago_in_words(pedido.updated_at) %>
+                </span>
+              </div>
+            </div>
+
+            <hr class="border-dashed border-stone-200 mx-5">
+
+            <%# Lista de Itens %>
+            <div class="p-4 pl-5 md:p-5 md:pl-6 flex-1 bg-stone-50/50 overflow-y-auto max-h-[300px] scrollbar-thin">
+              <ul class="space-y-3 font-mono text-xs md:text-sm">
+                <% pedido.order_items.each do |item| %>
+                  <li class="flex items-start gap-3 group/item">
+                    <span class="font-bold text-stone-800 bg-white border border-stone-200 w-6 h-6 flex items-center justify-center rounded text-xs shadow-sm mt-0.5 shrink-0">
+                      <%= item.quantidade %>
+                    </span>
+                    <div class="flex-1 leading-snug">
+                      <span class="text-stone-700 font-bold"><%= item.product.nome %></span>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+
+            <%# Rodapé do Card %>
+            <div class="bg-white border-t border-stone-100 p-4 pl-5 md:p-5 md:pl-6 mt-auto space-y-4 relative z-10">
+              
+              <%# Grid de Pagamento e Total %>
+              <div class="grid grid-cols-2 gap-3 md:gap-4">
+                <div class="bg-stone-50 rounded-xl p-2 md:p-2.5 border border-stone-100 flex flex-col justify-center">
+                  <span class="text-[10px] uppercase font-bold text-stone-400 mb-0.5">Pagamento</span>
+                  <div class="flex items-center gap-1.5 font-bold text-stone-700 text-xs md:text-sm truncate">
+                    <% icon, color = case pedido.tipo_pagamento
+                       when 'Pix' then ['💠', 'text-green-600']
+                       when 'Cartão de Crédito' then ['💳', 'text-orange-600']
+                       when 'Dinheiro / Espécie' then ['💵', 'text-stone-600']
+                       else ['❓', 'text-stone-400']
+                       end %>
+                    <span><%= icon %></span>
+                    <span class="<%= color %> truncate"><%= pedido.tipo_pagamento || 'N/A' %></span>
+                  </div>
+                </div>
+
+                <div class="bg-stone-50 rounded-xl p-2 md:p-2.5 border border-stone-100 flex flex-col justify-center text-right">
+                  <span class="text-[10px] uppercase font-bold text-stone-400 mb-0.5">Total</span>
+                  <span class="font-black text-[#32491E] text-base md:text-lg"><%= number_to_currency(pedido.total) %></span>
+                </div>
+              </div>
+
+              <%# Endereço %>
+              <div class="flex items-start gap-2.5">
+                <div class="bg-orange-100 text-orange-600 p-1.5 rounded-lg shrink-0 mt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                    <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="text-xs md:text-sm text-stone-600 leading-snug break-words w-full">
+                  <% if pedido.respond_to?(:endereco) && pedido.endereco.present? %>
+                     <span class="font-medium text-stone-800"><%= pedido.endereco %></span>
+                   <% elsif pedido.user && pedido.user.respond_to?(:endereco) && pedido.user.endereco.present? %>
+                     <span class="font-medium text-stone-800"><%= pedido.user.endereco %></span>
+                     <span class="text-[10px] text-stone-400 block">(Do Perfil)</span>
+                   <% else %>
+                     <span class="text-stone-400 italic">Retirada no Balcão</span>
+                   <% end %>
+                </div>
+              </div>
+
+              <%# Botões de Ação %>
+              <div class="grid grid-cols-4 gap-2">
+                
+                <%# Cancelar %>
+                <%= button_to cancelar_pedido_path(pedido.id), method: :patch, data: { turbo_confirm: "Cancelar pedido?" }, class: "col-span-1 h-full flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-600 rounded-xl transition cursor-pointer border border-red-200 active:scale-95", title: "Cancelar Pedido" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                <% end %>
+
+                <%# Concluir %>
+                <%= button_to concluir_pedido_path(pedido.id), method: :patch, class: "col-span-3 w-full group/btn relative overflow-hidden bg-[#32491E] hover:bg-green-900 text-white py-3 md:py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-green-900/20 active:translate-y-0.5 cursor-pointer" do %>
+                  <span class="relative z-10 flex items-center justify-center gap-2">
+                    <span>Concluir</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 md:w-5 md:h-5 group-hover/btn:translate-x-1 transition-transform">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  <div class="absolute inset-0 bg-white/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                <% end %>
+
+              </div>              
+            </div>
+
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </main>
+</div>

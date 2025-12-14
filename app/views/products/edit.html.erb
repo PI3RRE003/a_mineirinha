@@ -1,0 +1,38 @@
+<% content_for :title, "Editar Produto" %>
+
+<div 
+  class="fixed inset-0 -z-10 bg-repeat"
+  style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px;"
+>
+</div>
+
+<div class="mx-auto md:w-2/3 w-full">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="font-bold text-4xl text-amber-100 bg-[#32491E] p-2">Editar Produto</h1>
+    
+    <%# Botão de voltar discreto no topo %>
+    <%= link_to products_path, class: "bg-amber-100 p-2 rounded-sm hover:text-orange-600 transition-colors" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    <% end %>
+  </div>
+
+  <%# Container branco para destacar o formulário do fundo %>
+  <div class="bg-amber-100 shadow-md rounded-lg p-6 sm:p-8 border border-orange-100">
+    <%= render "form", product: @product %>
+  </div>
+
+  <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <%# Link simples para voltar %>
+    <%= link_to "← Voltar para a lista", products_path, class: "text-gray-500 hover:text-orange-600 font-medium transition-colors duration-200" %>
+
+    <%# Botão secundário para ver o produto (cor laranja bem clara) %>
+    <%= link_to @product, class: "group flex items-center justify-center gap-2 rounded-md px-4 py-2 bg-amber-100 text-[#32491E] font-medium border border-orange-200 transition-all duration-200" do %>
+      <span>Ver como ficou</span>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 group-hover:translate-x-1 transition-transform">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+      </svg>
+    <% end %>
+  </div>
+</div>

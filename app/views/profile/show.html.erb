@@ -1,0 +1,137 @@
+<div 
+  class="fixed inset-0 -z-10 bg-repeat"
+  style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px;"
+>
+</div>
+
+<%# Ajuste de Padding vertical: py-6 no mobile, py-12 no desktop %>
+<div class="w-full py-6 md:py-12 px-4 sm:px-6 lg:px-8 font-sans">
+  
+  <div class="max-w-5xl mx-auto">
+    
+    <%# Botão Voltar %>
+    <div class="mb-6">
+      <%= link_to root_path, class: "inline-flex items-center text-[#32491E] bg-amber-100 p-2 pr-4 rounded-full hover:text-orange-600 font-bold transition shadow-sm" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+        Voltar ao Cardápio
+      <% end %>
+    </div>
+
+    <%# GRID PRINCIPAL: 1 coluna no mobile, 2 no desktop %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
+      
+      <%# --- CARD 1: SEUS DADOS --- %>
+      <%# Mudança: rounded-3xl no mobile, rounded-[40px] no desktop. p-6 no mobile, p-8 no desktop %>
+      <div class="bg-amber-100 rounded-3xl md:rounded-[40px] shadow-2xl border-4 border-white overflow-hidden p-6 md:p-8 flex flex-col h-full">
+        
+        <h2 class="text-2xl md:text-3xl font-bold text-[#32491E] mb-6 flex items-center gap-3">
+          <span class="bg-[#32491E] text-white p-2 rounded-xl shrink-0">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+          </span>
+          Seus Dados
+        </h2>
+        
+        <div class="space-y-6 flex-1">
+          <div>
+            <label class="text-xs font-bold text-[#32491E] uppercase tracking-wider ml-1">Nome</label>
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 text-stone-800 font-medium shadow-sm mt-1 truncate">
+               <%= @user.nome.presence || content_tag(:span, "Não informado", class: "text-stone-400 italic") %>
+            </div>
+          </div>
+          
+          <div>
+            <label class="text-xs font-bold text-[#32491E] uppercase tracking-wider ml-1">Email</label>
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 text-stone-800 font-medium shadow-sm mt-1 truncate">
+               <%= @user.email %>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-[#32491E] uppercase tracking-wider ml-1">Telefone</label>
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 text-stone-800 font-medium shadow-sm mt-1">
+               <%= @user.telefone.presence || content_tag(:span, "--", class: "text-stone-400 italic") %>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-[#32491E] uppercase tracking-wider ml-1">Endereço de Entrega</label>
+            <%# Adicionado break-words para endereços longos não quebrarem o layout no mobile %>
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 text-stone-700 mt-1 shadow-sm min-h-[80px] break-words">
+              <%= @user.endereco.presence || content_tag(:span, "Você ainda não cadastrou um endereço de entrega.", class: "text-stone-400 italic") %>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-8 mt-auto">
+          <%= link_to edit_user_registration_path, class: "group w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg shadow-green-900/10 text-lg font-bold text-white bg-[#32491E] hover:bg-green-900 transition transform hover:-translate-y-1 items-center gap-2 active:scale-95" do %>
+            <span>Editar Meus Dados</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 group-hover:translate-x-1 transition"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+          <% end %>
+        </div>
+      </div>
+
+      <%# --- CARD 2: CARTÃO FIDELIDADE --- %>
+      <div class="bg-white rounded-3xl md:rounded-[40px] shadow-2xl border-4 border-[#32491E] p-6 md:p-8 relative overflow-hidden h-full">
+        
+        <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <span class="text-7xl md:text-9xl">🧀</span>
+        </div>
+
+        <div class="relative z-10">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#32491E] mb-2 text-center">Cartão Fidelidade</h2>
+            <p class="text-center text-stone-500 mb-6 md:mb-8 font-medium text-sm md:text-base">Junte 10 queijos e ganhe uma surpresa!</p>
+            
+            <%# Cartão Verde %>
+            <div class="bg-[#32491E] rounded-2xl md:rounded-3xl border-2 border-dashed border-[#32491E] p-4 md:p-6">
+                <%# 
+                   GRID RESPONSIVO:
+                   - gap-x-2 no mobile (menor), gap-x-2 no desktop.
+                   - gap-y-4 no mobile, gap-y-6 no desktop.
+                %>
+                <div class="grid grid-cols-5 gap-y-4 md:gap-y-6 gap-x-2 justify-items-center">
+                <% (1..10).each do |i| %>
+                    
+                    <% if i <= @pontos_atuais %>
+                    <%# Bolinha preenchida: w-10 (40px) no mobile, w-14 (56px) no desktop %>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-[#32491E] rounded-full flex items-center justify-center text-lg md:text-2xl shadow-lg shadow-orange-500/40 transform scale-110 transition border-2 md:border-4 border-white">
+                        🧀
+                    </div>
+                    <% else %>
+                    <%# Bolinha vazia %>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center text-stone-300 font-bold border-2 border-stone-200 shadow-inner text-sm md:text-base">
+                        <%= i %>
+                    </div>
+                    <% end %>
+
+                <% end %>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <% if @pontos_atuais == 0 %>
+                    <p class="text-stone-500 py-2 text-sm md:text-base">Faça seu primeiro pedido para começar a pontuar!</p>
+                <% elsif @pontos_atuais == 10 %>
+                    <div class="bg-green-100 border border-green-300 text-green-800 p-4 rounded-2xl font-bold animate-pulse shadow-sm">
+                        <p class="text-lg md:text-xl mb-1">🎁 PARABÉNS!</p>
+                        <span class="text-xs md:text-sm font-normal">Você completou o cartão! Mostre essa tela na próxima entrega para resgatar.</span>
+                    </div>
+                <% else %>
+                    <p class="font-bold text-amber-100 text-sm md:text-lg bg-[#32491E] inline-block px-4 md:px-6 py-2 rounded-full">
+                        Faltam apenas <%= 10 - @pontos_atuais %> pontos! 😋
+                    </p>
+                <% end %>
+            </div>
+            
+            <div class="mt-8 text-center border-t border-orange-100 pt-4">
+                <p class="text-[10px] md:text-xs text-stone-400 font-bold uppercase tracking-widest">Total Histórico</p>
+                <p class="text-xl md:text-2xl font-bold text-stone-700"><%= @user.pontos %></p>
+            </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

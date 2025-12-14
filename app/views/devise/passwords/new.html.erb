@@ -1,0 +1,60 @@
+<div 
+  class="fixed inset-0 -z-10 bg-[var(--color-verde-escuro)] bg-repeat"
+  style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px; background-blend-mode: overlay;"
+>
+</div>
+
+<div class="w-full grid place-items-center p-4 font-sans">
+
+  <main class="bg-amber-100 w-full max-w-sm rounded-[40px] p-8 flex flex-col items-center shadow-2xl relative overflow-hidden text-[var(--color-verde-escuro)]">
+    
+    <div class="mb-4 relative">
+      <div class="w-32 h-32 rounded-full border-2 border-[var(--color-verde-escuro)] p-1 flex items-center justify-center bg-[var(--color-creme-fundo)]">
+        <%# Troque pelo nome da sua ilustração %>
+        <%= image_tag "Mineirinha.png", class: "rounded-full w-full h-full object-cover", alt: "Ilustração" %>
+      </div>
+    </div>
+
+    <div class="mb-4 relative">
+      <div class="flex justify-center w-full">
+         <%# Troque pelo nome da sua logo escrita %>
+         <%= image_tag "a_mineirinha.png", class: "h-12 w-auto object-contain", alt: "Logo à Mineirinha" %>
+      </div>
+    </div>
+
+    <div class="text-center mb-6">
+      <h2 class="font-bold text-lg uppercase tracking-wider mb-2">Recuperar Senha</h2>
+      <p class="text-xs font-medium opacity-80 px-4">
+        Digite seu e-mail abaixo e enviaremos instruções para você redefinir sua senha.
+      </p>
+    </div>
+
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: "w-full flex flex-col gap-4" }) do |f| %>
+      
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="relative group">
+        <%= f.email_field :email, 
+            autofocus: true, 
+            autocomplete: "email", 
+            placeholder: "DIGITE SEU EMAIL",
+            class: "w-full py-4 px-6 rounded-full bg-transparent border-2 border-[var(--color-verde-escuro)] text-[var(--color-verde-escuro)] placeholder-[var(--color-verde-escuro)] font-bold text-center text-sm outline-none focus:ring-2 focus:ring-[var(--color-verde-escuro)] focus:ring-offset-2 focus:ring-offset-[var(--color-creme-fundo)] transition-all" 
+        %>
+      </div>
+
+      <%= f.submit "ENVIAR INSTRUÇÕES", 
+          class: "w-full mt-4 py-4 rounded-full bg-[#32491E] text-amber-100 font-bold text-sm uppercase tracking-wider hover:bg-opacity-90 hover:scale-[1.02] transition-all active:scale-95 cursor-pointer border-none shadow-lg" 
+      %>
+
+    <% end %>
+    
+    <div class="mt-8 flex flex-col items-center gap-3 w-full border-t border-[var(--color-verde-escuro)] border-opacity-20 pt-4">
+      
+      <%= link_to "Voltar para Login", new_session_path(resource_name), class: "text-xs font-bold text-[var(--color-verde-escuro)] hover:underline opacity-80" %>
+      
+      <%= link_to "Criar nova conta", new_registration_path(resource_name), class: "text-xs font-bold text-[var(--color-verde-escuro)] hover:underline opacity-80" %>
+      
+    </div>
+
+  </main>
+</div>

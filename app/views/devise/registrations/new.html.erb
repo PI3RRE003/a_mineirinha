@@ -1,0 +1,79 @@
+<style>
+  :root {
+    --color-verde-escuro: #32491E;
+    --color-creme-fundo: #e6ddc5;
+  }
+</style>
+
+<div 
+  class="fixed inset-0 -z-10 bg-repeat"
+  style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px; background-blend-mode: overlay;"
+>
+</div>
+
+<div class="w-full grid place-items-center p-4 font-sans">
+
+  <main class="bg-amber-100 w-full max-w-sm rounded-[40px] p-4 flex flex-col items-center shadow-2xl relative overflow-hidden text-[var(--color-verde-escuro)] -m-20">
+    
+    <div class="mb-4 relative">
+      <div class="w-32 h-32 rounded-full border-2 p-1 flex items-center justify-center">
+        <%# Troque pelo caminho da sua ilustração %>
+        <%= image_tag "Mineirinha.png", class: "rounded-full w-full h-full object-cover", alt: "Logo Ilustração" %> 
+      </div>
+    </div>
+
+    <div class="mb-6 relative">
+      <div class="flex justify-center w-full">
+         <%# Troque pelo caminho da sua logo escrita %>
+         <%= image_tag "a_mineirinha.png", class: "h-12 w-auto object-contain", alt: "Logo à Mineirinha" %>
+      </div>
+    </div>
+    
+    <h2 class="mb-6 font-bold text-lg tracking-widest uppercase border-b-2 border-[var(--color-verde-escuro)] pb-1">
+      Criar Conta
+    </h2>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "w-full flex flex-col gap-4" }) do |f| %>
+      
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="relative group">
+        <%= f.email_field :email, 
+            autofocus: true, 
+            autocomplete: "email", 
+            placeholder: "SEU EMAIL",
+            class: "w-full py-4 px-6 rounded-full bg-transparent border-2 border-[var(--color-verde-escuro)] text-[var(--color-verde-escuro)] placeholder-[var(--color-verde-escuro)] font-bold text-center text-sm outline-none focus:ring-2 focus:ring-[var(--color-verde-escuro)] focus:ring-offset-2 focus:ring-offset-[var(--color-creme-fundo)] transition-all" 
+        %>
+      </div>
+
+      <div class="relative group">
+        <%= f.password_field :password, 
+            autocomplete: "new-password",
+            placeholder: "CRIE UMA SENHA",
+            class: "w-full py-4 px-6 rounded-full bg-transparent border-2 border-[var(--color-verde-escuro)] text-[var(--color-verde-escuro)] placeholder-[var(--color-verde-escuro)] font-bold text-center text-sm outline-none focus:ring-2 focus:ring-[var(--color-verde-escuro)] focus:ring-offset-2 focus:ring-offset-[var(--color-creme-fundo)] transition-all" 
+        %>
+        <% if @minimum_password_length %>
+          <p class="text-[10px] text-center mt-1 font-bold opacity-70">(Mínimo <%= @minimum_password_length %> caracteres)</p>
+        <% end %>
+      </div>
+
+      <div class="relative group">
+        <%= f.password_field :password_confirmation, 
+            autocomplete: "new-password", 
+            placeholder: "CONFIRME A SENHA",
+            class: "w-full py-4 px-6 rounded-full bg-transparent border-2 border-[var(--color-verde-escuro)] text-[var(--color-verde-escuro)] placeholder-[var(--color-verde-escuro)] font-bold text-center text-sm outline-none focus:ring-2 focus:ring-[var(--color-verde-escuro)] focus:ring-offset-2 focus:ring-offset-[var(--color-creme-fundo)] transition-all" 
+        %>
+      </div>
+
+      <%= f.submit "CADASTRAR", 
+          class: "w-full mt-4 py-4 rounded-full bg-[var(--color-verde-escuro)] text-[var(--color-creme-fundo)] font-bold text-sm uppercase tracking-wider hover:bg-opacity-90 hover:scale-[1.02] transition-all active:scale-95 cursor-pointer border-none shadow-lg" 
+      %>
+
+    <% end %>
+    
+    <div class="mt-6 text-center space-y-2">
+      <%= link_to "Já tenho uma conta (Entrar)", new_session_path(resource_name), class: "block text-xs font-bold text-[var(--color-verde-escuro)] hover:underline opacity-80" %>
+    </div>
+
+  </main>
+</div>

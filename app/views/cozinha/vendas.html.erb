@@ -1,0 +1,151 @@
+<div class="min-h-screen bg-stone-100 font-sans pb-20">
+  
+  <%# --- CABEÇALHO --- %>
+  <%# Ajuste: py-4 no mobile, flex-col para empilhar itens %>
+  <div class="bg-stone-900 text-white py-6 px-4 md:px-8 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <span class="text-3xl">📈</span>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold">Relatório de Vendas</h1>
+          <p class="text-stone-400 text-xs md:text-sm">Histórico de pedidos concluídos</p>
+        </div>
+      </div>
+      
+      <%= link_to cozinha_path, class: "w-full md:w-auto flex justify-center items-center gap-2 text-stone-300 hover:text-white transition font-medium bg-white/10 md:bg-transparent py-2 rounded-lg md:py-0" do %>
+        <span>← Voltar para Cozinha</span>
+      <% end %>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+    
+    <%# --- CARD DE RESUMO FINANCEIRO --- %>
+    <%# Ajuste: texto menor no mobile (text-3xl) e maior no desktop (text-5xl) %>
+    <div class="bg-gradient-to-r from-[#32491E] to-green-900 rounded-3xl p-6 md:p-8 text-white shadow-xl mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="text-center md:text-left">
+        <h2 class="text-green-100 font-medium mb-1 text-sm md:text-base">Faturamento Total (Concluídos)</h2>
+        <div class="text-4xl md:text-5xl font-bold tracking-tight">
+          <%= number_to_currency(@faturamento_total) %>
+        </div>
+      </div>
+      <div class="w-full md:w-auto bg-white/10 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 flex flex-col items-center justify-center">
+        <span class="block text-2xl md:text-3xl font-bold"><%= @vendas.count %></span>
+        <span class="text-xs md:text-sm text-green-100 uppercase tracking-wider">Vendas Realizadas</span>
+      </div>
+    </div>
+
+    <% if @vendas.empty? %>
+      <div class="text-center py-20 bg-white rounded-3xl border border-stone-200">
+        <p class="text-stone-500">Nenhuma venda concluída ainda.</p>
+      </div>
+    <% else %>
+      
+      <%# --- TABELA RESPONSIVA (MÁGICA AQUI) --- %>
+      <%# No mobile, removemos o visual de tabela e usamos cards %>
+      <div class="bg-transparent md:bg-white md:rounded-3xl md:shadow-sm md:border md:border-stone-200 md:overflow-hidden">
+        
+        <table class="w-full text-left border-collapse">
+          
+          <%# Cabeçalho da Tabela: Só aparece em telas médias pra cima (md:table-header-group) %>
+          <thead class="hidden md:table-header-group bg-stone-50 border-b border-stone-100">
+            <tr>
+              <th class="px-6 py-4 text-xs font-bold text-stone-400 uppercase tracking-wider">ID / Data</th>
+              <th class="px-6 py-4 text-xs font-bold text-stone-400 uppercase tracking-wider">Cliente</th>
+              <th class="px-6 py-4 text-xs font-bold text-stone-400 uppercase tracking-wider">Resumo</th>
+              <th class="px-6 py-4 text-xs font-bold text-stone-400 uppercase tracking-wider">Pagamento</th>
+              <th class="px-6 py-4 text-xs font-bold text-stone-400 uppercase tracking-wider text-right">Valor Total</th>
+            </tr>
+          </thead>
+
+          <tbody class="block md:table-row-group space-y-4 md:space-y-0">
+            <% @vendas.each do |venda| %>
+              <%# 
+                 TR: No mobile é um CARD (flex-col, bg-white, shadow). 
+                 No desktop é uma LINHA (table-row).
+              %>
+              <tr class="flex flex-col md:table-row bg-white rounded-2xl shadow-sm border border-stone-100 md:border-0 md:shadow-none p-4 md:p-0 <%= venda.status == 'Cancelado' ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-stone-50' %> transition">
+                
+                <%# COLUNA 1: ID e DATA %>
+                <td class="px-2 py-2 md:px-6 md:py-4 border-b md:border-b-0 border-dashed border-stone-100 md:border-none flex justify-between md:table-cell items-center">
+                  <%# Label Mobile %>
+                  <span class="md:hidden text-xs font-bold text-stone-400 uppercase">Pedido</span>
+                  
+                  <div class="text-right md:text-left">
+                    <span class="block font-bold <%= venda.status == 'Cancelado' ? 'text-red-800' : 'text-stone-800' %>">
+                      #<%= venda.id %> <%= '(CANCELADO)' if venda.status == 'Cancelado' %>
+                    </span>
+                    <span class="text-xs text-stone-400"><%= venda.updated_at.strftime("%d/%m %H:%M") %></span>
+                  </div>
+                </td>
+
+                <%# COLUNA 2: CLIENTE %>
+                <td class="px-2 py-2 md:px-6 md:py-4 border-b md:border-b-0 border-dashed border-stone-100 md:border-none flex justify-between md:table-cell items-center">
+                  <span class="md:hidden text-xs font-bold text-stone-400 uppercase">Cliente</span>
+                  
+                  <div class="text-right md:text-left font-medium text-stone-700 text-sm">
+                    <%= venda.respond_to?(:cliente_nome) && venda.cliente_nome.present? ? venda.cliente_nome : venda.user.try(:nome) || "Cliente ##{venda.user_id}" %>
+                  </div>
+                </td>
+
+                <%# COLUNA 3: RESUMO (ITENS) %>
+                <td class="px-2 py-2 md:px-6 md:py-4 border-b md:border-b-0 border-dashed border-stone-100 md:border-none flex justify-between md:table-cell items-center">
+                  <span class="md:hidden text-xs font-bold text-stone-400 uppercase">Itens</span>
+                  
+                  <div class="text-right md:text-left text-sm text-stone-600">
+                     <%# Exibe apenas 2 itens no resumo e '...' se tiver mais %>
+                     <% venda.order_items.first(2).each do |item| %>
+                        <div class="whitespace-nowrap"><%= item.quantidade %>x <%= item.product.nome %></div>
+                     <% end %>
+                     <% if venda.order_items.count > 2 %>
+                       <span class="text-xs text-stone-400 italic">+ <%= venda.order_items.count - 2 %> outros</span>
+                     <% end %>
+                  </div>
+                </td>
+
+                <%# COLUNA 4: PAGAMENTO %>
+                <td class="px-2 py-2 md:px-6 md:py-4 border-b md:border-b-0 border-dashed border-stone-100 md:border-none flex justify-between md:table-cell items-center">
+                  <span class="md:hidden text-xs font-bold text-stone-400 uppercase">Pagamento</span>
+                  
+                  <div class="text-right md:text-left">
+                    <% case venda.tipo_pagamento %>
+                    <% when 'Pix' %>
+                      <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                        💠 Pix
+                      </span>
+                    <% when 'Cartão de Crédito' %>
+                      <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+                        💳 Cartão
+                      </span>
+                    <% when 'Dinheiro / Espécie' %>
+                      <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-stone-100 text-stone-700">
+                        💵 Dinheiro
+                      </span>
+                    <% else %>
+                      <span class="text-stone-400 text-xs">-</span>
+                    <% end %>
+                  </div>
+                </td>
+
+                <%# COLUNA 5: TOTAL %>
+                <td class="px-2 py-2 md:px-6 md:py-4 flex justify-between md:table-cell items-center pt-3 md:pt-4">
+                  <span class="md:hidden text-sm font-bold text-stone-800 uppercase">Total Final</span>
+
+                  <div class="text-right">
+                    <% if venda.status == 'Cancelado' %>
+                      <span class="font-bold text-stone-400 line-through text-lg"><%= number_to_currency(venda.total) %></span>
+                      <div class="text-[10px] text-red-500 font-bold uppercase">Estornado</div>
+                    <% else %>
+                      <span class="font-bold text-[#32491E] text-lg md:text-base"><%= number_to_currency(venda.total) %></span>
+                    <% end %>
+                  </div>
+                </td>
+
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </main>
+</div>
