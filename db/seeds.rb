@@ -1,31 +1,30 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
 # db/seeds.rb
 
-# db/seeds.rb
+puts "🌱 Iniciando atualização do Admin..."
 
-puts "🌱 Criando Admin..."
-
-# ENV['ADMIN_PASSWORD'] vai buscar a senha no cofre do Render
+# Senha de fallback apenas para teste local, em produção usará a ENV
 senha_secreta = ENV['ADMIN_PASSWORD']
 
-if senha_secreta.blank?
-  puts "⚠️  AVISO: Senha de admin não configurada. Pulei a criação."
+# Localiza ou inicializa o usuário
+admin = User.find_or_initialize_by(email: 'gisantos880@gmail.com')
+
+# Define os dados
+admin.nome = 'Chef Giovanna'
+admin.password = senha_secreta
+admin.password_confirmation = senha_secreta
+
+# --- A CORREÇÃO ESTÁ AQUI EMBAIXO ---
+# Trocamos admin.admin por admin.is_admin
+admin.is_admin = true
+# ------------------------------------
+
+# Preenche dados obrigatórios (caso existam no seu model)
+admin.telefone = '11999999999' if admin.respond_to?(:telefone)
+admin.endereco = 'Cozinha Central - Rua do Pão de Queijo, 100' if admin.respond_to?(:endereco)
+
+if admin.save
+  puts "✅ SUCESSO! Admin 'Chef Giovanna' (gisantos880@gmail.com) criado/atualizado."
 else
-  User.find_or_create_by!(email: 'gisantos880@gmail.com') do |user|
-    user.nome = 'Chef Giovanna'
-    user.password = senha_secreta
-    user.password_confirmation = senha_secreta
-    user.admin = true
-    user.endereco = 'Rua da Matriz' # Se for obrigatório no seu model
-    user.telefone = '999999999'     # Se for obrigatório
-  end
-  puts "✅ Admin criado com sucesso!"
+  puts "❌ ERRO FATAL: Não foi possível salvar o Admin."
+  puts "MOTIVO: #{admin.errors.full_messages.join(', ')}"
 end
