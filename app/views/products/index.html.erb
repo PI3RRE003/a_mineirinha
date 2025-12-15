@@ -5,29 +5,29 @@
 </div>
 
 <%# 
-   AJUSTE RESPONSIVO: 
-   - Adicionei 'min-h-screen' para o fundo cobrir tudo.
-   - Mudei rounded-[40px] para ser menor no mobile (rounded-t-3xl) e grande no desktop (md:rounded-[40px]).
-   - Adicionei 'pb-10' para dar um respiro no final da página.
+   AJUSTE RESPONSIVO DO CARD PRINCIPAL:
+   - Mobile: rounded-[30px] (aplica arredondamento completo, não só no topo)
+   - Desktop: md:rounded-[40px] (mantém o arredondamento maior)
+   - Adicionei 'overflow-hidden' para garantir que nada "vaze" das bordas arredondadas.
 %>
-<div class="w-full bg-amber-100 rounded-t-3xl md:rounded-[40px] font-sans text-stone-800 min-h-screen pb-10 mt-4 md:mt-8 shadow-2xl">
+<div class="w-full bg-amber-100 rounded-[30px] md:rounded-[40px] font-sans text-stone-800 min-h-screen pb-10 -mt-26 mb-12 md:-mt-26 shadow-2xl overflow-hidden">
 
-  <%# NAVBAR RESPONSIVA %>
-  <nav class="bg-amber-100 border-b border-stone-200 py-4 px-4 md:px-6 sticky top-0 z-40 rounded-t-3xl md:rounded-t-[40px]">
+  <%# NAVBAR: Ajustada para acompanhar a curva do pai (rounded-t-[30px]) %>
+  <nav class="bg-amber-100 border-b border-stone-200 py-4 px-4 md:px-6 sticky top-0 z-40 rounded-t-[30px] md:rounded-t-[40px]">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
       
-      <%# Logo Centralizada no Mobile %>
+      <%# Logo %>
       <%= link_to root_path, class: "flex items-center gap-2 group hover:opacity-90 transition" do %>
         <%= image_tag 'Mineirinha.png', alt: 'Logo a mineirinha', class: "h-16 md:h-20 transition-all" %>        
         <%= image_tag 'a_mineirinha.png', alt: 'Logo a mineirinha', class: "pl-2 h-8 md:h-10 transition-all" %>        
       <% end %>
 
-      <%# Menu de Links (Wrap para quebrar linha se necessário) %>
+      <%# Menu de Links %>
       <div class="flex flex-wrap justify-center items-center gap-4 md:gap-6 text-sm font-medium">
         <% if user_signed_in? %>
           
           <% if current_user.try(:is_admin?) %>
-              <%= link_to "Gerenciar", "/cozinha", class: "bg-orange-100 text-orange-700 px-3 py-1 rounded-lg hover:bg-orange-200 transition font-bold" %>
+              <%= link_to "Gerenciar", "/cozinha", class: "bg-[#32491E] text-amber-100 px-3 py-1 rounded-lg hover:bg-orange-200 transition font-bold" %>
           <% end %>
 
           <%= link_to carrinho_path, class: "flex items-center gap-2 text-stone-600 hover:text-stone-900 transition bg-white/50 px-3 py-1.5 rounded-full hover:bg-white" do %>
@@ -84,9 +84,9 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
       <% @products.each do |product| %>
         
-        <div class="group bg-white rounded-[2rem] p-3 border border-stone-100 hover:border-orange-200 shadow-sm hover:shadow-xl transition duration-300 flex flex-col h-full transform hover:-translate-y-1">
+        <div class="group bg-white rounded-[2rem] p-3 border border-stone-100 hover:border-orange-200 shadow-sm hover:shadow-xl transition duration-300 flex flex-col h-full transform hover:-translate-y-1 ">
           
-          <%# Imagem do Produto (Corrigido duplicidade de divs) %>
+          <%# Imagem do Produto %>
           <div class="relative bg-stone-100 rounded-[1.5rem] overflow-hidden aspect-square mb-4 group-hover:shadow-inner transition">
             
             <% if product.imagem.attached? %>
@@ -114,7 +114,7 @@
             <p class="text-xs text-stone-500 leading-relaxed mb-4 line-clamp-2 min-h-[2.5em]"><%= product.descricao %></p>
             
             <div class="mt-auto pt-4 border-t border-dashed border-stone-100">
-              <%= button_to add_to_cart_path(product.id), method: :post, class: "w-full py-3 rounded-xl bg-stone-900 text-white font-bold text-sm hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-orange-600/20 flex justify-center items-center gap-2" do %>
+              <%= button_to add_to_cart_path(product.id), method: :post, class: "w-full py-3 rounded-xl bg-[#32491E] text-white font-bold text-sm hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-orange-600/20 flex justify-center items-center gap-2" do %>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 <span>Adicionar</span>
               <% end %>
