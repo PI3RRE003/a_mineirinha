@@ -49,8 +49,8 @@
           <%= button_to "Sair", destroy_user_session_path, method: :delete, class: "text-stone-400 hover:text-red-500 transition cursor-pointer bg-transparent border-0 text-xs sm:text-sm font-bold" %>
           
         <% else %>
-          <%= link_to "Entrar", new_user_session_path, class: "text-stone-600 hover:text-stone-900 font-bold" %>
-          <%= link_to "Criar Conta", new_user_registration_path, class: "bg-stone-800 text-white px-5 py-2 rounded-lg hover:bg-stone-700 transition shadow-md hover:shadow-lg" %>
+          <%= link_to "Entrar", new_user_session_path, class: "text-white bg-[#32491E] p-2 rounded-xl font-bold" %>
+          <%= link_to "Criar Conta", new_user_registration_path, class: "bg-[#32491E] text-white px-5 py-2 rounded-lg hover:bg-stone-700 transition shadow-md hover:shadow-lg" %>
         <% end %>
       </div>
     </div>
