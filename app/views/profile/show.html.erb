@@ -5,7 +5,7 @@
 </div>
 
 <%# Ajuste de Padding vertical: py-6 no mobile, py-12 no desktop %>
-<div class="w-full py-6 md:py-12 px-4 sm:px-6 lg:px-8 font-sans -mt-26">
+<div class="w-full py-6 md:py-12 px-4 sm:px-6 lg:px-8 font-sans">
   
   <div class="max-w-5xl mx-auto">
     
@@ -19,11 +19,10 @@
       <% end %>
     </div>
 
-    <%# GRID PRINCIPAL: 1 coluna no mobile, 2 no desktop %>
+    <%# GRID PRINCIPAL %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
       
       <%# --- CARD 1: SEUS DADOS --- %>
-      <%# Mudança: rounded-3xl no mobile, rounded-[40px] no desktop. p-6 no mobile, p-8 no desktop %>
       <div class="bg-amber-100 rounded-3xl md:rounded-[40px] shadow-2xl border-4 border-white overflow-hidden p-6 md:p-8 flex flex-col h-full">
         
         <h2 class="text-2xl md:text-3xl font-bold text-[#32491E] mb-6 flex items-center gap-3">
@@ -57,7 +56,6 @@
 
           <div>
             <label class="text-xs font-bold text-[#32491E] uppercase tracking-wider ml-1">Endereço de Entrega</label>
-            <%# Adicionado break-words para endereços longos não quebrarem o layout no mobile %>
             <div class="bg-white p-4 rounded-2xl border border-stone-200 text-stone-700 mt-1 shadow-sm min-h-[80px] break-words">
               <%= @user.endereco.presence || content_tag(:span, "Você ainda não cadastrou um endereço de entrega.", class: "text-stone-400 italic") %>
             </div>
@@ -81,30 +79,16 @@
 
         <div class="relative z-10">
             <h2 class="text-2xl md:text-3xl font-bold text-[#32491E] mb-2 text-center">Cartão Fidelidade</h2>
-            <p class="text-center text-stone-500 mb-6 md:mb-8 font-medium text-sm md:text-base">Junte 10 queijos e ganhe uma surpresa!</p>
+            <p class="text-center text-stone-500 mb-6 md:mb-8 font-medium text-sm md:text-base">Junte 10 queijos e ganhe uma surpresa!<br>500g de pão de queijo congelado 🎁</p>
             
-            <%# Cartão Verde %>
             <div class="bg-[#32491E] rounded-2xl md:rounded-3xl border-2 border-dashed border-[#32491E] p-4 md:p-6">
-                <%# 
-                   GRID RESPONSIVO:
-                   - gap-x-2 no mobile (menor), gap-x-2 no desktop.
-                   - gap-y-4 no mobile, gap-y-6 no desktop.
-                %>
                 <div class="grid grid-cols-5 gap-y-4 md:gap-y-6 gap-x-2 justify-items-center">
                 <% (1..10).each do |i| %>
-                    
                     <% if i <= @pontos_atuais %>
-                    <%# Bolinha preenchida: w-10 (40px) no mobile, w-14 (56px) no desktop %>
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-[#32491E] rounded-full flex items-center justify-center text-lg md:text-2xl shadow-lg shadow-orange-500/40 transform scale-110 transition border-2 md:border-4 border-white">
-                        🧀
-                    </div>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-[#32491E] rounded-full flex items-center justify-center text-lg md:text-2xl shadow-lg shadow-orange-500/40 transform scale-110 transition border-2 md:border-4 border-white">🧀</div>
                     <% else %>
-                    <%# Bolinha vazia %>
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center text-stone-300 font-bold border-2 border-stone-200 shadow-inner text-sm md:text-base">
-                        <%= i %>
-                    </div>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center text-stone-300 font-bold border-2 border-stone-200 shadow-inner text-sm md:text-base"><%= i %></div>
                     <% end %>
-
                 <% end %>
                 </div>
             </div>
@@ -123,15 +107,128 @@
                     </p>
                 <% end %>
             </div>
-            
-            <div class="mt-8 text-center border-t border-orange-100 pt-4">
-                <p class="text-[10px] md:text-xs text-stone-400 font-bold uppercase tracking-widest">Total Histórico</p>
-                <p class="text-xl md:text-2xl font-bold text-stone-700"><%= @user.pontos %></p>
-            </div>
         </div>
+      </div>
+    </div> 
 
+
+    <%# --- SEÇÃO: HISTÓRICO DE COMPRAS --- %>
+    <div class="mt-8 md:mt-12 bg-white rounded-3xl md:rounded-[40px] shadow-2xl border-4 border-white overflow-hidden">
+      
+      <%# Cabeçalho da Seção %>
+      <div class="px-6 py-5 md:px-8 md:py-6 border-b border-stone-100 bg-amber-50 flex items-center gap-3">
+         <span class="text-3xl">📜</span>
+         <h2 class="text-2xl md:text-3xl font-bold text-[#32491E]">Histórico de Compras</h2>
+      </div>
+
+      <div class="p-6 md:p-8">
+        <% if @pedidos_antigos.present? && @pedidos_antigos.any? %>
+          
+          <div class="space-y-4">
+            <% @pedidos_antigos.each do |pedido| %>
+              
+              <%# --- DESTAQUE PARA PEDIDO EM ANDAMENTO (Recebido) --- %>
+              <% is_active = pedido.status.to_s.downcase == 'recebido' %>
+              <% card_class = is_active ? "border-orange-300 bg-orange-50/20 shadow-md ring-2 ring-orange-100" : "border-stone-200 bg-white hover:border-orange-200" %>
+              
+              <div class="<%= card_class %> border rounded-2xl p-4 md:p-6 transition group relative overflow-hidden">
+                
+                <% if is_active %>
+                   <div class="absolute top-0 right-0 bg-orange-400 text-white text-[10px] px-3 py-1 rounded-bl-xl font-bold shadow-sm z-10">
+                     EM ANDAMENTO
+                   </div>
+                <% end %>
+
+                <%# Topo do Card do Pedido %>
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3 relative z-0">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-[#32491E] text-lg">Pedido #<%= pedido.id %></span>
+                      <span class="text-xs text-stone-400 font-medium"><%= pedido.created_at.strftime("%d/%m/%Y às %H:%M") %></span>
+                    </div>
+                  </div>
+
+                  <%# Badge de Status %>
+                  <% 
+                    cor_status = case pedido.status.to_s.downcase
+                      when 'concluído', 'concluido' then 'bg-green-100 text-green-800 border-green-200'
+                      when 'recebido' then 'bg-orange-100 text-orange-800 border-orange-200'
+                      when 'cancelado' then 'bg-red-50 text-red-600 border-red-100 line-through'
+                      else 'bg-blue-50 text-blue-600 border-blue-100'
+                    end 
+                  %>
+                  <div class="self-start md:self-auto <%= 'mt-4 md:mt-0' if is_active %>">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold border <%= cor_status %> uppercase tracking-wider">
+                      <%= pedido.status %>
+                    </span>
+                  </div>
+                </div>
+
+                <%# Lista de Itens (Resumida) %>
+                <div class="bg-stone-50 rounded-xl p-3 md:p-4 mb-4">
+                  <ul class="space-y-2">
+                    <% pedido.order_items.each do |item| %>
+                      <li class="flex justify-between items-center text-sm md:text-base text-stone-600">
+                        <span>
+                          <strong class="text-[#32491E]"><%= item.quantidade %>x</strong> <%= item.product.nome %>
+                        </span>
+                        <span class="text-stone-400 text-xs"><%= number_to_currency(item.preco_unitario * item.quantidade) %></span>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+
+                <%# Rodapé do Pedido %>
+                <div class="flex items-center justify-between pt-2 border-t border-dashed border-stone-100">
+                   
+                   <%# Esquerda: Pagamento %>
+                   <div class="flex items-center gap-2 text-xs md:text-sm font-bold text-stone-500">
+                      <% if pedido.tipo_pagamento == 'Pix' %> 
+                        <span>💠 Pix</span>
+                      <% elsif pedido.tipo_pagamento&.include?('Cartão') %> 
+                        <span>💳 Cartão</span>
+                      <% else %> 
+                        <span>💵 Dinheiro</span>
+                      <% end %>
+                   </div>
+                   
+                   <%# Direita: Botão Cancelar + Total %>
+                   <div class="flex items-center gap-3 md:gap-4">
+                      
+                      <%# --- BOTÃO CANCELAR (Corrigido para cancelar_pedido_cliente_path) --- %>
+                      <% if is_active %>
+                        <%= button_to cancelar_pedido_cliente_path(pedido.id), method: :patch, data: { turbo_confirm: "Tem certeza que deseja cancelar este pedido?" }, class: "group flex items-center gap-1 text-xs font-bold text-red-400 hover:text-red-600 bg-white hover:bg-red-50 px-2 md:px-3 py-1.5 rounded-lg transition border border-red-100 shadow-sm" do %>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3 md:w-4 md:h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                            <span class="hidden xs:inline">Cancelar</span>
+                        <% end %>
+                      <% end %>
+
+                      <div class="text-right">
+                        <span class="text-xs text-stone-400 mr-2">Total</span>
+                        <span class="text-xl font-bold text-orange-600"><%= number_to_currency(pedido.total) %></span>
+                      </div>
+                   </div>
+
+                </div>
+
+              </div>
+            <% end %>
+          </div>
+
+        <% else %>
+          <%# Estado Vazio %>
+          <div class="text-center py-12 md:py-16">
+            <div class="text-6xl mb-4 grayscale opacity-30">🛒</div>
+            <h3 class="text-xl font-bold text-stone-600">Nenhum pedido anterior</h3>
+            <p class="text-stone-400 mb-6 text-sm md:text-base">Seus pedidos finalizados aparecerão aqui.</p>
+            <%= link_to root_path, class: "bg-[#32491E] text-white px-6 py-3 rounded-2xl font-bold hover:bg-green-900 transition inline-flex items-center gap-2 shadow-lg shadow-green-900/10" do %>
+               <span>Fazer meu primeiro pedido</span>
+            <% end %>
+          </div>
+        <% end %>
       </div>
 
     </div>
+
   </div>
 </div>

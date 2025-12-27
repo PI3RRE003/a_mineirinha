@@ -1,0 +1,19 @@
+pt-BR:
+  activerecord:
+    models:
+      user: "Usuário"
+      product: "Produto"
+      order: "Pedido"
+    attributes:
+      user:
+        nome: "Nome Completo"
+        email: "E-mail"
+        password: "Senha"
+        password_confirmation: "Confirmação da Senha"
+        current_password: "Senha Atual" # <--- AQUI ESTÁ O SEU PROBLEMA
+        telefone: "Telefone"
+        endereco: "Endereço"
+      product:
+        nome: "Nome do Produto"
+        preco: "Preço"
+        descricao: "Descrição"

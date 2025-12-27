@@ -25,6 +25,11 @@ gem "devise"
 
 gem "letter_opener"
 
+gem "rails-i18n"
+
+gem "wicked_pdf"
+
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 

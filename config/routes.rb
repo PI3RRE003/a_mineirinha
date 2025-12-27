@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get "orders/new"
   get "orders/create"
   devise_for :users
+  get "produtos/arquivados", to: "products#arquivados", as: "produtos_arquivados"
   resources :products
 
   # Rotas do Carrinho
@@ -13,22 +14,26 @@ Rails.application.routes.draw do
   delete "carrinho/remove/:id", to: "cart#remove", as: "remove_from_cart"
   post "carrinho/finalizar", to: "cart#finalizar", as: "finalizar_pedido"
 
+  # Aumentar/Diminuir Quantidade
+  post "carrinho/aumentar/:id", to: "cart#increase_quantity", as: "increase_item"
+  post "carrinho/diminuir/:id", to: "cart#decrease_quantity", as: "decrease_item"
+
   # Rota da Cozinha
   get "cozinha", to: "cozinha#show", as: "cozinha"
-
   patch "cozinha/:id/concluir", to: "cozinha#concluir", as: "concluir_pedido"
+
+  # Rota de Cancelamento da COZINHA (Mantivemos o nome original aqui para não quebrar a cozinha)
   patch "cozinha/:id/cancelar", to: "cozinha#cancelar", as: "cancelar_pedido"
+
   get "vendas", to: "cozinha#vendas", as: "historico_vendas"
 
   # Perfil Usuario
   get "perfil", to: "profile#show", as: "perfil_usuario"
 
+  # --- CORREÇÃO AQUI: Mudamos o nome para 'cancelar_pedido_cliente' ---
+  patch "pedido/:id/cancelar", to: "profile#cancelar_pedido", as: "cancelar_pedido_cliente"
 
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
   root "products#index"

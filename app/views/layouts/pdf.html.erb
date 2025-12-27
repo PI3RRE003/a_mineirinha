@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <%# Usamos CDN do Tailwind para garantir que o estilo funcione no PDF %>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: sans-serif; -webkit-print-color-adjust: exact; }
+    .break-page { page-break-after: always; }
+    tr { page-break-inside: avoid; }
+  </style>
+</head>
+<body class="bg-white p-8">
+  <%= yield %>
+</body>
+</html>
