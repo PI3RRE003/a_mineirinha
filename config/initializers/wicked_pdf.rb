@@ -1,5 +1,10 @@
-WickedPdf.config = {
-  # Caminho para o executável que você instalou.
-  # ATENÇÃO: Verifique se o arquivo existe exatamente nesta pasta no seu PC.
-  exe_path: "C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe"
-}
+
+  if Rails.env.production?
+    WickedPdf.config = {
+      exe_path: Gem.bin_path("wkhtmltopdf-binary", "wkhtmltopdf")
+    }
+  else
+    WickedPdf.config = {
+      exe_path: "C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe"
+    }
+  end
