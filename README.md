@@ -2,6 +2,7 @@
 
 Um sistema de gestão de pedidos e controle de faturamento desenvolvido em Ruby on Rails, focado em pequenos negócios de alimentação (como vendas de pão de queijo). O sistema conta com controle de estoque, histórico de vendas, relatórios em PDF e sistema de pontos de fidelidade.
 
+https://a-mineirinha.onrender.com/
 ---
 
 ## 🚀 Funcionalidades
