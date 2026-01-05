@@ -61,7 +61,7 @@ Bash
 📄 Licença
 Este projeto é para fins educacionais e de gestão interna.
 
-##Telas
+## Telas
 
 <img width="1900" height="876" alt="Captura de tela 2025-12-27 194803" src="https://github.com/user-attachments/assets/28590e96-08f7-4012-8932-a6b52139bc5e" />
 <img width="1920" height="1080" alt="Captura de tela 2025-12-27 194837" src="https://github.com/user-attachments/assets/72d0c0ae-64a2-4703-b1d0-fa50b49fffa8" />
