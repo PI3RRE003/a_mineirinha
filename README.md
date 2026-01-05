@@ -44,14 +44,7 @@ https://a-mineirinha.onrender.com/
 
 1. **Instalar Ruby**: Via rbenv ou rvm.
 
-2. **Dependência PDF**:
-
-Bash
-
-brew install homebrew/cask/wkhtmltopdf
-3. Setup do projeto:
-
-Bash
+2. **Dependência PDF**:Bash brew install homebrew/cask/wkhtmltopdf
 
 3. **Setup do projeto:**
    ```bash
