@@ -93,21 +93,18 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  # --- CONFIGURAÇÃO DO BREVO (SENDINBLUE) ---
+  # 1. Configura a URL base para os links do Devise
+  # No Render, troque 'localhost:3000' pela URL do seu site (ex: 'mineirinha.onrender.com')
+  config.action_mailer.default_url_options = { host: "https://a-mineirinha.onrender.com/" }
+
+  # 2. Configura o envio via Mailtrap
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.perform_deliveries = true
-
-  # Troque pelo seu domínio real quando tiver um (ex: 'www.seusite.com.br')
-  # Se for usar Render gratuito, geralmente é algo como:
-  config.action_mailer.default_url_options = { host: "seu-app.onrender.com" }
-
   config.action_mailer.smtp_settings = {
-    address:              "smtp-relay.brevo.com",
-    port:                 587,
-    domain:               "brevo.com",
-    user_name:            ENV["BREVO_LOGIN"],    # <-- Rails lê do cofre
-    password:             ENV["BREVO_PASSWORD"], # <-- Rails lê do cofre
-    authentication:       "plain",
-    enable_starttls_auto: true
+    user_name: "SEU_USER_NAME_AQUI",
+    password: "SEU_PASSWORD_AQUI",
+    address: "sandbox.smtp.mailtrap.io",
+    host: "sandbox.smtp.mailtrap.io",
+    port: "2525",
+    authentication: :cram_md5
   }
 end
