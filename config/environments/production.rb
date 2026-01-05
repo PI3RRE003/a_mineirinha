@@ -99,12 +99,14 @@ Rails.application.configure do
 
   # 2. Configura o envio via Mailtrap
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    user_name: "SEU_USER_NAME_AQUI",
-    password: "SEU_PASSWORD_AQUI",
-    address: "sandbox.smtp.mailtrap.io",
-    host: "sandbox.smtp.mailtrap.io",
-    port: "2525",
-    authentication: :cram_md5
-  }
+# Looking to send emails in production? Check out our Email API/SMTP product!
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = {
+  user_name: "4602f6ad43ef49",
+  password: "a7f3291addca00",
+  address: "sandbox.smtp.mailtrap.io",
+  host: "sandbox.smtp.mailtrap.io",
+  port: "2525",
+  authentication: :login
+}
 end
