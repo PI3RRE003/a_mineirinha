@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   get "carrinho", to: "cart#show", as: "carrinho"
   post "carrinho/add/:product_id", to: "cart#add", as: "add_to_cart"
   delete "carrinho/remove/:id", to: "cart#remove", as: "remove_from_cart"
-  post "carrinho/finalizar", to: "cart#finalizar", as: "finalizar_pedido"
+  post "carrinho/finalizar", to: "orders#finalizar_pedido", as: "finalizar_pedido", defaults: { format: :json }
 
   # Aumentar/Diminuir Quantidade
   post "carrinho/aumentar/:id", to: "cart#increase_quantity", as: "increase_item"

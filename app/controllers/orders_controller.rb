@@ -35,10 +35,6 @@ class OrdersController < ApplicationController
     end
   end
 
-  def current_order
-    # Busca pela sessão ou pelo último pedido em aberto do usuário
-    @current_order ||= Order.find_by(id: session[:order_id]) || current_user&.orders&.find_by(status: "Carrinho")
-  end
 
   # --- AÇÃO DE FINALIZAR CARRINHO ---
   def finalize
@@ -102,7 +98,7 @@ class OrdersController < ApplicationController
       telefone = ENV["LOJA_WHATSAPP"] || "5511999999999"
       url_whatsapp = "https://api.whatsapp.com/send?phone=#{telefone}&text=#{@order.gerar_mensagem_whatsapp}"
 
-      render json: { url: url_whatsapp }
+      render json: { url: url_whatsapp }, status: :ok
     else
       puts "ERRO DE VALIDAÇÃO: #{@order.errors.full_messages}"
       # Se falhar, enviamos o erro exato para o log do navegador
@@ -119,5 +115,12 @@ class OrdersController < ApplicationController
     def order_params
       # Adicionei :tipo_pagamento aqui por segurança, caso use em outros lugares
       params.require(:order).permit(:cliente_nome, :endereco, :quantidade, :product_id, :tipo_pagamento)
+    end
+
+    def current_order
+      # 1. Tenta achar pelo ID guardado na sessão (navegador)
+      # 2. Se não achar, busca o último pedido 'Carrinho' do usuário logado
+      @current_order ||= Order.find_by(id: session[:order_id]) ||
+                        current_user.orders.find_by(status: "carrinho")
     end
 end

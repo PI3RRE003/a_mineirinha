@@ -214,33 +214,35 @@
 </div>
 
 <script>
-  function atualizarAvisos(pagamento) {
+  // Esta função precisa estar no objeto 'window' para o 'onchange' do HTML achá-la sempre
+  window.atualizarAvisos = function(pagamento) {
     const campoTroco = document.getElementById('campo_troco');
     const taxaCredito = document.getElementById('taxa_credito');
     const taxaDebito = document.getElementById('taxa_debito');
     
     const totalElemento = document.getElementById('valor-total-exibicao');
+    if (!totalElemento) return;
+
     const valorOriginal = parseFloat(totalElemento.dataset.valorOriginal);
     let valorFinal = valorOriginal;
 
-    campoTroco.classList.add('hidden');
-    taxaCredito.classList.add('hidden');
-    taxaDebito.classList.add('hidden');
+    // Resetar visibilidade
+    [campoTroco, taxaCredito, taxaDebito].forEach(el => el?.classList.add('hidden'));
 
     if (pagamento === 'Dinheiro') {
-      campoTroco.classList.remove('hidden');
+      campoTroco?.classList.remove('hidden');
     } 
     else if (pagamento === 'Cartão de Crédito') {
-      taxaCredito.classList.remove('hidden');
+      taxaCredito?.classList.remove('hidden');
       valorFinal = valorOriginal * 1.0309;
     } 
     else if (pagamento === 'Cartão de Débito') {
-      taxaDebito.classList.remove('hidden');
+      taxaDebito?.classList.remove('hidden');
       valorFinal = valorOriginal * 1.0089;
     }
 
     if (pagamento !== 'Dinheiro') {
-      const inputTroco = campoTroco.querySelector('input');
+      const inputTroco = campoTroco?.querySelector('input');
       if (inputTroco) inputTroco.value = '';
     }
 
@@ -250,47 +252,51 @@
     });
   }
 
-  async function confirmarEViaZap() {
-  const form = document.getElementById('form-finalizar');
-  const pagamentoSelecionado = form.querySelector('input[name="tipo_pagamento"]:checked');
+  // Função principal de envio
+  window.confirmarEViaZap = async function() {
+    const form = document.getElementById('form-finalizar');
+    const pagamentoSelecionado = form.querySelector('input[name="tipo_pagamento"]:checked');
 
-  if (!pagamentoSelecionado) {
-    alert("Por favor, selecione uma forma de pagamento.");
-    return;
-  }
-
-  // 1. Mostrar Animação de Sucesso
-  const overlay = document.getElementById('success-overlay');
-  overlay.classList.remove('hidden');
-
-  // 2. Enviar dados via Fetch (AJAX)
-  const formData = new FormData(form);
-
-  try {
-    const response = await fetch(form.action, {
-      method: 'POST',
-      headers: {
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
-        'Accept': 'application/json'
-      },
-      body: formData
-    });
-
-    const data = await response.json();
-
-    if (data.url) {
-      // 3. Espera 2 segundos para o usuário ver a animação e redireciona
-      setTimeout(() => {
-        window.location.href = data.url;
-      }, 2000);
-    } else {
-      alert("Erro ao salvar pedido.");
-      overlay.classList.add('hidden');
+    if (!pagamentoSelecionado) {
+      alert("Por favor, selecione uma forma de pagamento.");
+      return;
     }
-  } catch (error) {
-    console.error("Erro:", error);
-    overlay.classList.add('hidden');
-    alert("Houve um problema na conexão.");
+
+    const overlay = document.getElementById('success-overlay');
+    overlay.classList.remove('hidden');
+
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(form.action, { 
+        method: 'POST',
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+          'Accept': 'application/json'
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro no servidor");
+      }
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Delay para o usuário ver a animação de sucesso
+        setTimeout(() => {
+          window.location.href = data.url;
+        }, 2000);
+      } else {
+        throw new Error("URL do WhatsApp não recebida.");
+      }
+
+    } catch (error) {
+      console.error("Erro:", error);
+      overlay.classList.add('hidden');
+      alert("Erro: " + error.message);
+    }
   }
-}
 </script>
