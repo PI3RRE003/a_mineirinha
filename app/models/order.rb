@@ -7,12 +7,11 @@ class Order < ApplicationRecord
   # Callback para processar fidelidade após salvar
   after_save :entregar_pontos_fidelidade
 
+  # Remova as duas validações anteriores e use esta:
   validates :tipo_pagamento, inclusion: {
     in: OPCOES_PAGAMENTO,
-    message: "não é válido. Escolha entre Pix, Dinheiro ou Cartão."
-  }, allow_nil: true
-
-  validates :tipo_pagamento, inclusion: { in: OPCOES_PAGAMENTO }, on: :update, if: -> { status == "Recebido" }
+    message: "%{value} não é uma opção válida"
+  }, if: -> { status == "Recebido" }
 
   # Método para calcular o total base (sem taxas da maquininha)
   # Útil para o Controller saber o valor original antes de aplicar os 2% ou 5%

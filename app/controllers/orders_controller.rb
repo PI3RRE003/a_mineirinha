@@ -35,6 +35,11 @@ class OrdersController < ApplicationController
     end
   end
 
+  def current_order
+    # Busca pela sessão ou pelo último pedido em aberto do usuário
+    @current_order ||= Order.find_by(id: session[:order_id]) || current_user&.orders&.find_by(status: "Carrinho")
+  end
+
   # --- AÇÃO DE FINALIZAR CARRINHO ---
   def finalize
       @order = current_user.orders.find_by(status: "Carrinho")
@@ -64,41 +69,47 @@ class OrdersController < ApplicationController
       end
   end
 
-def finalizar_pedido
-  @order = current_order
+  def finalizar_pedido
+    @order = current_order
 
-  # 1. Cálculo de taxas
-  valor_base = @order.calculate_base_total
-  tipo_pagamento = params[:tipo_pagamento]
+    # Garantimos que não operamos em um pedido inexistente
+    if @order.nil?
+      return render json: { error: "Carrinho não encontrado" }, status: :not_found
+    end
 
-  taxa = case tipo_pagamento
-  when "Cartão de Crédito" then 1.0309
-  when "Cartão de Débito"  then 1.0089
-  else 1.00
+    valor_base = @order.calculate_base_total
+    tipo_pagamento = params[:tipo_pagamento]
+
+    taxa = case tipo_pagamento
+    when "Cartão de Crédito" then 1.0309
+    when "Cartão de Débito"  then 1.0089
+    else 1.00
+    end
+
+    total_com_taxa = (valor_base * taxa).round(2)
+
+    # Usamos update sem o "!" para capturar erros amigavelmente
+    if @order.update(
+      tipo_pagamento: tipo_pagamento,
+      troco: params[:troco],
+      total: total_com_taxa,
+      status: "Recebido",
+      user: current_user
+    )
+      # Sucesso: Limpa a sessão e envia a URL
+      session[:order_id] = nil
+
+      telefone = ENV["LOJA_WHATSAPP"] || "5511999999999"
+      url_whatsapp = "https://api.whatsapp.com/send?phone=#{telefone}&text=#{@order.gerar_mensagem_whatsapp}"
+
+      render json: { url: url_whatsapp }
+    else
+      puts "ERRO DE VALIDAÇÃO: #{@order.errors.full_messages}"
+      # Se falhar, enviamos o erro exato para o log do navegador
+      render json: { error: @order.errors.full_messages.to_sentence }, status: :unprocessable_entity
+    end
   end
 
-  total_com_taxa = (valor_base * taxa).round(2)
-
-  # 2. Atualização do pedido
-  if @order.update(
-    tipo_pagamento: tipo_pagamento,
-    troco: params[:troco],
-    total: total_com_taxa,
-    status: "Recebido"
-  )
-
-    # No controller, dentro do 'if @order.update'
-    session[:order_id] = nil # Isso limpa o carrinho atual da sessão do usuário
-    # 3. Preparação do link do WhatsApp
-    telefone = ENV["LOJA_WHATSAPP"] || "5511999999999"
-    url_whatsapp = "https://api.whatsapp.com/send?phone=#{telefone}&text=#{@order.gerar_mensagem_whatsapp}"
-
-    # 4. RESPOSTA JSON (Essencial para o seu JavaScript funcionar)
-    render json: { url: url_whatsapp }
-  else
-    render json: { error: "Erro ao processar o pedido" }, status: :unprocessable_entity
-  end
-end
   private
 
     def set_product
