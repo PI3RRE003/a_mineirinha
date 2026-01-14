@@ -64,26 +64,43 @@ class OrdersController < ApplicationController
       end
   end
 
-  def finalizar_pedido
-    @order = current_order # Ajuste conforme a sua lógica de pegar o pedido
+def finalizar_pedido
+    @order = current_order # Ou o método que você usa para localizar o carrinho atual
 
-    @order.assign_attributes(
-      tipo_pagamento: params[:tipo_pagamento],
+    # 1. Pegamos o valor base (soma dos produtos)
+    valor_base = @order.calculate_base_total
+
+    # 2. Capturamos o pagamento do formulário (params[:tipo_pagamento])
+    # e definimos a taxa exata
+    tipo_pagamento = params[:tipo_pagamento]
+
+    taxa = case tipo_pagamento
+    when "Cartão de Crédito" then 1.0309
+    when "Cartão de Débito"  then 1.0089
+    else 1.00 # Pix ou Dinheiro
+    end
+
+    # 3. Calculamos o total final arredondado
+    total_com_taxa = (valor_base * taxa).round(2)
+
+    # 4. Atualizamos o pedido com todos os dados
+    if @order.update(
+      tipo_pagamento: tipo_pagamento,
       troco: params[:troco],
+      total: total_com_taxa,
       status: "Recebido"
     )
-
-    if @order.save
-      # Lê do Render ou usa um padrão se for local
+      # 5. Pegamos o telefone das variáveis de ambiente do Render
       telefone = ENV["LOJA_WHATSAPP"] || "5511999999999"
 
+      # 6. Geramos a URL (o modelo usará o @order.total que acabamos de salvar)
       url_whatsapp = "https://api.whatsapp.com/send?phone=#{telefone}&text=#{@order.gerar_mensagem_whatsapp}"
 
-      # O redirecionamento automático
+      # 7. Redirecionamento limpo
       redirect_to url_whatsapp, allow_other_host: true
     else
-      flash[:error] = "Não foi possível processar o pedido."
-      redirect_to carrinho_path
+      flash[:error] = "Erro ao processar o pedido. Verifique os dados e tente novamente."
+      redirect_to carrinho_path # Verifique se o nome da rota está correto
     end
   end
 

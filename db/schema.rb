@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_27_221827) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_143419) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -78,7 +78,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_221827) do
     t.boolean "pontos_entregues"
     t.string "status", default: "Carrinho"
     t.string "tipo_pagamento"
-    t.decimal "total", precision: 10, scale: 2
+    t.decimal "total", precision: 10, scale: 2, default: "0.0"
     t.string "troco"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
