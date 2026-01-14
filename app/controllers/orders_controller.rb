@@ -68,14 +68,16 @@ class OrdersController < ApplicationController
   def finalizar_pedido
     @order = current_order
 
-    # Garantimos que não operamos em um pedido inexistente
     if @order.nil?
       return render json: { error: "Carrinho não encontrado" }, status: :not_found
     end
 
-    valor_base = @order.calculate_base_total
+    # Pegamos os parâmetros vindos do JavaScript (FormData)
     tipo_pagamento = params[:tipo_pagamento]
+    troco = params[:troco]
 
+    # Cálculo das taxas
+    valor_base = @order.calculate_base_total
     taxa = case tipo_pagamento
     when "Cartão de Crédito" then 1.0309
     when "Cartão de Débito"  then 1.0089
@@ -84,27 +86,37 @@ class OrdersController < ApplicationController
 
     total_com_taxa = (valor_base * taxa).round(2)
 
-    # Usamos update sem o "!" para capturar erros amigavelmente
+    # Tenta salvar as informações no banco
     if @order.update(
       tipo_pagamento: tipo_pagamento,
-      troco: params[:troco],
+      troco: troco,
       total: total_com_taxa,
-      status: "Recebido",
+      status: "Recebido", # Mudamos para Recebido para aparecer na Cozinha
       user: current_user
     )
-      # Sucesso: Limpa a sessão e envia a URL
+      # Limpa a sessão para o cliente poder começar um novo carrinho depois
       session[:order_id] = nil
 
-      telefone = ENV["LOJA_WHATSAPP"] || "5511999999999"
-      url_whatsapp = "https://api.whatsapp.com/send?phone=#{telefone}&text=#{@order.gerar_mensagem_whatsapp}"
+      # PREPARA A URL DO WHATSAPP
+      # Aqui o Rails vai chamar o @order.gerar_mensagem_whatsapp que corrigimos no Model
+      telefone = ENV["LOJA_WHATSAPP"] || "5511999999999" # Certifique-se de que essa variável existe
 
-      render json: { url: url_whatsapp }, status: :ok
+      begin
+        mensagem = @order.gerar_mensagem_whatsapp
+        url_whatsapp = "https://api.whatsapp.com/send?phone=#{telefone}&text=#{mensagem}"
+        render json: { url: url_whatsapp }, status: :ok
+      rescue => e
+        # Se o erro 500 for dentro do método de mensagem, ele vai printar aqui:
+        puts "ERRO NA GERAÇÃO DA MENSAGEM: #{e.message}"
+        render json: { error: "Erro ao gerar mensagem: #{e.message}" }, status: :internal_server_error
+      end
     else
-      puts "ERRO DE VALIDAÇÃO: #{@order.errors.full_messages}"
-      # Se falhar, enviamos o erro exato para o log do navegador
       render json: { error: @order.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end
   end
+
+
+
 
   private
 
