@@ -95,7 +95,7 @@ Rails.application.configure do
 
   # 1. Configura a URL base para os links do Devise
   # No Render, troque 'localhost:3000' pela URL do seu site (ex: 'mineirinha.onrender.com')
-  config.action_mailer.default_url_options = { host: "a-mineirinha.onrender.com/" }
+  config.action_mailer.default_url_options = { host: "a-mineirinha.onrender.com/", protocol: "https" }
 
   # 2. Configura o envio via Mailtrap
   config.action_mailer.delivery_method = :smtp
@@ -106,7 +106,7 @@ config.action_mailer.smtp_settings = {
   password: "a7f3291addca00",
   address: "sandbox.smtp.mailtrap.io",
   host: "sandbox.smtp.mailtrap.io",
-  port: "2525",
+  port: "587",
   authentication: :login
 }
 end

@@ -64,6 +64,29 @@ class OrdersController < ApplicationController
       end
   end
 
+  def finalizar_pedido
+    @order = current_order # Ajuste conforme a sua lógica de pegar o pedido
+
+    @order.assign_attributes(
+      tipo_pagamento: params[:tipo_pagamento],
+      troco: params[:troco],
+      status: "Recebido"
+    )
+
+    if @order.save
+      # Lê do Render ou usa um padrão se for local
+      telefone = ENV["LOJA_WHATSAPP"] || "5511999999999"
+
+      url_whatsapp = "https://api.whatsapp.com/send?phone=#{telefone}&text=#{@order.gerar_mensagem_whatsapp}"
+
+      # O redirecionamento automático
+      redirect_to url_whatsapp, allow_other_host: true
+    else
+      flash[:error] = "Não foi possível processar o pedido."
+      redirect_to carrinho_path
+    end
+  end
+
   private
 
     def set_product
