@@ -22,21 +22,32 @@ class CartController < ApplicationController
   def add
     @order = current_user.orders.find_or_create_by(status: "carrinho")
     product = Product.find(params[:product_id])
+    sabores_escolhidos = params[:sabores]&.reject(&:blank?)&.join(", ")
 
-    order_item = @order.order_items.find_or_initialize_by(product: product)
-
-    if order_item.new_record?
-      order_item.preco_unitario = product.preco
-      order_item.quantidade = 1
+    if product.is_combo?
+      # O ERRO ESTAVA AQUI: Precisamos garantir que preco_unitario receba o valor
+      order_item = @order.order_items.new(
+        product: product,
+        preco_unitario: product.preco, # <--- GARANTA ESTA LINHA
+        quantidade: 1,
+        observacoes: sabores_escolhidos
+      )
     else
-      order_item.quantidade += 1
+      order_item = @order.order_items.find_or_initialize_by(product: product)
+      if order_item.new_record?
+        order_item.preco_unitario = product.preco
+        order_item.quantidade = 1
+      else
+        order_item.quantidade += 1
+      end
     end
 
-    order_item.save
-    atualizar_total
-
-    # Redireciona de volta para onde o usuário estava
-    redirect_back fallback_location: root_path, notice: "😋 #{product.nome} adicionado!"
+    if order_item.save
+      atualizar_total
+      redirect_back fallback_location: root_path, notice: "😋 Combo adicionado com seus sabores!"
+    else
+      redirect_back fallback_location: root_path, alert: "Erro ao adicionar."
+    end
   end
 
   # 3. AUMENTAR QUANTIDADE (Botão +)
@@ -110,8 +121,47 @@ def finalizar
 end
 
 
+
+
   private
 
+  def montar_mensagem_whatsapp(order)
+    # Cabeçalho
+    msg = "✅ *NOVO PEDIDO - A MINEIRINHA*\n"
+    msg += "------------------------------------------\n"
+    msg += "👤 *Cliente:* #{current_user.nome}\n"
+    msg += "📞 *Telefone:* #{current_user.telefone}\n"
+    msg += "------------------------------------------\n\n"
+
+    # Itens do Pedido
+    order.order_items.each do |item|
+      msg += "*#{item.quantidade}x #{item.product.nome}* - #{ActionController::Base.helpers.number_to_currency(item.preco_unitario * item.quantidade)}\n"
+
+      # Se for combo, detalha os sabores com um recuo visual
+      if item.observacoes.present?
+        sabores = item.observacoes.split(", ").join(" + ")
+        msg += "   └ _Sabores: #{sabores}_\n"
+      end
+    end
+
+    # Resumo Financeiro
+    msg += "\n------------------------------------------\n"
+    msg += "💰 *TOTAL: #{ActionController::Base.helpers.number_to_currency(order.total)}*\n"
+    msg += "💳 *Pagamento:* #{order.tipo_pagamento}\n"
+
+    # Adiciona troco apenas se o cliente preencheu
+    msg += "💵 *Troco para:* #{order.troco}\n" if order.troco.present?
+
+    # Endereço de Entrega
+    msg += "\n📍 *ENTREGAR EM:*\n"
+    msg += "#{order.endereco}\n"
+    msg += "------------------------------------------\n"
+    msg += "🙏 _Obrigado pela preferência!_"
+
+    msg
+  end
+
+  private
   # Método auxiliar para manter o total sempre correto no banco
   def atualizar_total
     @order = current_user.orders.find_by(status: "carrinho")
