@@ -6,6 +6,14 @@ class OrdersController < ApplicationController
   # GET /orders
   def index
     @orders = Order.all.order(created_at: :desc)
+
+    # Filtro por Período (Data e Hora)
+    if params[:inicio].present? && params[:fim].present?
+      # O Rails converte strings de datetime do formulário para o formato do banco automaticamente
+      @orders = @orders.where(created_at: params[:inicio]..params[:fim])
+    end
+
+    @orders = @orders.order(created_at: :desc)
   end
 
   # GET /orders/1
@@ -66,6 +74,12 @@ class OrdersController < ApplicationController
   end
 
   def finalizar_pedido
+    horario_atual = Time.current.hour
+
+    if horario_atual >= 22 || horario_atual < 8
+      render json: { error: "Loja fechada! Atendemos das 08:00 às 22:00." }, status: :forbidden
+      return
+    end
     @order = current_order
 
     if @order.nil?
