@@ -4,12 +4,19 @@ class CozinhaController < ApplicationController
 
   # Tela Principal (Monitoramento)
   def show
-    # Esconde Carrinho, Concluído e Cancelado da tela principal
-    # Mostra apenas: Recebido, Preparando, Pronto (se houver esse status)
+    # Base: pedidos que não são rascunho (Carrinho) nem finalizados (Concluído/Cancelado)
     @pedidos = Order.where.not(status: [ "Carrinho", "Concluído", "Cancelado" ])
-                    .order(created_at: :asc) # Ordem de chegada (mais antigos primeiro)
-  end
 
+    # NOVO FILTRO: Abrir pedidos de um período específico (Dia e Hora)
+    if params[:inicio].present? && params[:fim].present?
+      # Usamos DateTime.parse para garantir a precisão de horas e minutos
+      inicio = DateTime.parse(params[:inicio])
+      fim = DateTime.parse(params[:fim])
+      @pedidos = @pedidos.where(created_at: inicio..fim)
+    end
+
+    @pedidos = @pedidos.order(created_at: :asc)
+  end
   # Histórico e Relatórios
   def vendas
     # 1. Base da busca: Concluídos e Cancelados (exclui carrinhos abertos)
@@ -110,6 +117,27 @@ class CozinhaController < ApplicationController
     @pedido = Order.find(params[:id])
     @pedido.update(status: "Cancelado")
     redirect_to cozinha_path, alert: "Pedido ##{@pedido.id} foi cancelado."
+  end
+
+  def alternar_loja
+    # Busca o admin (estamos garantindo que ele existe no passo 1)
+    @admin = User.find_by(is_admin: true)
+
+    if @admin
+      # Inverte o valor booleano diretamente no banco
+      novo_status = !@admin.loja_aberta_manual
+      @admin.update_column(:loja_aberta_manual, novo_status)
+
+      status_txt = novo_status ? "ABERTA" : "FECHADA"
+      redirect_to cozinha_path, notice: "Loja #{status_txt} com sucesso!"
+    else
+      redirect_to cozinha_path, alert: "Erro: Nenhum administrador encontrado no banco!"
+    end
+  end
+
+  def clientes
+    # Busca todos os usuários que não são admins, ordenados por nome
+    @clientes = User.where(is_admin: [ false, nil ]).order(:nome)
   end
 
   private
