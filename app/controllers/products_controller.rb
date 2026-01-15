@@ -128,7 +128,7 @@ class ProductsController < ApplicationController
 
   def product_params
     # Se estiver usando Rails 8 / 7.1+
-    params.expect(product: [ :nome, :descricao, :preco, :disponivel, :gera_pontos, :imagem ])
+    params.expect(product: [ :nome, :descricao, :preco, :disponivel, :gera_pontos, :imagem, :is_combo, :combo_type ])
     # Se der erro, use o padrão antigo:
     # params.require(:product).permit(:nome, :descricao, :preco, :disponivel, :gera_pontos, :imagem)
   end
