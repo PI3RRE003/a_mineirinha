@@ -26,6 +26,12 @@ class Order < ApplicationRecord
 
     order_items.each do |item|
       msg += "• #{item.quantidade}x #{item.product.nome} (#{h.number_to_currency(item.preco_unitario)})\n"
+
+      # --- ADIÇÃO PARA OS SABORES DO COMBO ---
+      if item.observacoes.present?
+        msg += "  └ _Sabores: #{item.observacoes.split(', ').join(' + ')}_\n"
+      end
+      # ---------------------------------------
     end
 
     msg += "--------------------------------\n"
@@ -35,7 +41,6 @@ class Order < ApplicationRecord
       msg += "*Troco para:* #{troco}\n"
     end
 
-    # Alterado para usar o método dinâmico pix_copia_e_cola
     if tipo_pagamento == "Pix" || status == "carrinho"
       msg += "\n*PIX COPIA E COLA (Valor: #{h.number_to_currency(total)}):*\n"
       msg += "```#{pix_copia_e_cola}```\n\n"
@@ -48,7 +53,6 @@ class Order < ApplicationRecord
 
     ERB::Util.url_encode(msg)
   end
-
   # Gerador Dinâmico de Código Pix (Padrão EMV BC)
   def pix_copia_e_cola
     return "" if total.blank?
