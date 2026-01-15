@@ -46,6 +46,16 @@
         %>
       </div>
 
+      <%# --- NOVO CAMPO: DATA DE NASCIMENTO --- %>
+      <div class="relative group w-full">
+        <label class="block text-[10px] font-extrabold text-[var(--color-verde-escuro)] ml-6 mb-1 uppercase tracking-widest opacity-70 text-center">
+          Data de Nascimento
+        </label>
+        <%= f.date_field :data_nascimento, 
+            class: "w-full py-4 px-6 rounded-full bg-transparent border-2 border-[var(--color-verde-escuro)] text-[var(--color-verde-escuro)] font-bold text-center text-sm outline-none focus:ring-2 focus:ring-[var(--color-verde-escuro)] focus:ring-offset-2 focus:ring-offset-[var(--color-creme-fundo)] transition-all uppercase appearance-none" 
+        %>
+      </div>
+
       <%# --- NOVO CAMPO: TELEFONE --- %>
       <div class="relative group">
         <%= f.text_field :telefone, 
