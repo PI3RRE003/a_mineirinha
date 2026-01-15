@@ -6,8 +6,9 @@ class ApplicationController < ActionController::Base
 
   protected
   def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [ :nome, :telefone, :endereco ])
-    devise_parameter_sanitizer.permit(:account_update, keys: [ :nome, :endereco, :telefone ])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [ :nome, :telefone, :endereco, :data_nascimento ])
+    devise_parameter_sanitizer.permit(:account_update, keys: [ :nome, :endereco, :telefone, :data_nascimento ])
+    devise_parameter_sanitizer.permit(:sign_in, keys: [ :login, :password ])
   end
 
   # Changes to the importmap will invalidate the etag for HTML responses
