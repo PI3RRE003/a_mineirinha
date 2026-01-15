@@ -1,0 +1,91 @@
+<div class="min-h-screen bg-stone-100 font-sans w-full pb-20 relative pt-10">
+  <%# Fundo com textura para manter o padrão %>
+  <div class="fixed inset-0 pointer-events-none opacity-10 z-0" style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px;"></div>
+
+  <div class="w-full max-w-7xl mx-auto px-4 md:px-6 relative z-10 mt-6">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+      <h2 class="text-3xl font-black text-[#32491E] flex items-center gap-3 text-center md:text-left">
+        <span>👥</span> Gestão de Clientes
+      </h2>
+      <div class="bg-white px-6 py-2 rounded-full shadow-sm border-2 border-orange-200">
+         <span class="text-sm font-bold text-orange-600 uppercase tracking-widest">
+           📅 <%= I18n.l(Date.today, format: '%d de %B') %>
+         </span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <% @clientes.each do |cliente| %>
+        <% 
+          eh_aniversario = cliente.data_nascimento&.strftime("%d/%m") == Date.today.strftime("%d/%m")
+          pode_resgatar = (cliente.pontos || 0) >= 10
+        %>
+        
+        <div class="bg-white rounded-[40px] p-6 shadow-xl border-4 <%= eh_aniversario ? 'border-orange-400 animate-pulse-slow' : 'border-white' %> flex flex-col h-full transition-transform hover:-translate-y-1">
+          
+          <%# HEADER DO CARTÃO %>
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-amber-100">
+              <%= eh_aniversario ? '🎂' : '👤' %>
+            </div>
+            <div class="text-right">
+              <h3 class="font-black text-lg text-[#32491E] leading-tight uppercase"><%= cliente.nome %></h3>
+              <p class="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Desde <%= cliente.created_at.strftime("%m/%Y") %></p>
+            </div>
+          </div>
+
+          <%# INFO CONTATO %>
+          <div class="space-y-3 mb-6 flex-1">
+            <div class="flex items-center gap-3 text-sm font-bold text-stone-600 bg-stone-50 p-2 rounded-xl">
+              <span class="text-lg">📞</span> <%= cliente.telefone.presence || "S/ Telefone" %>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-bold text-stone-600 bg-stone-50 p-2 rounded-xl">
+              <span class="text-lg">📅</span> <%= cliente.data_nascimento ? cliente.data_nascimento.strftime("%d/%m/%Y") : "Não informado" %>
+            </div>
+          </div>
+
+          <%# ÁREA FIDELIDADE %>
+          <div class="bg-[#32491E] rounded-3xl p-5 text-white mb-4 relative overflow-hidden shadow-lg">
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-[9px] font-black uppercase tracking-widest opacity-60">Status Fidelidade</span>
+              <% if pode_resgatar %>
+                <span class="bg-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-black animate-bounce">PREMIAÇÃO DISPONÍVEL!</span>
+              <% end %>
+            </div>
+            
+            <div class="flex items-center gap-4">
+              <div class="text-4xl font-black italic"><%= cliente.pontos || 0 %><span class="text-sm opacity-40">/10</span></div>
+              <div class="flex-1 h-3 bg-black/30 rounded-full overflow-hidden">
+                <div class="h-full bg-orange-400 transition-all shadow-[0_0_10px_#fbbf24]" style="width: <%= [(cliente.pontos.to_f / 10 * 100), 100].min %>%"></div>
+              </div>
+            </div>
+          </div>
+
+          <%# BOTÕES DE WHATSAPP %>
+          <div class="grid grid-cols-1 gap-2">
+            <% if eh_aniversario %>
+              <% 
+                msg_niver = URI.encode_www_form_component("Olá #{cliente.nome}! 🎂 A Mineirinha passando para te desejar um Feliz Aniversário! Como presente, você ganhou um brinde especial no seu próximo pedido de pão de queijo! 🧀🎉")
+                url_niver = "https://api.whatsapp.com/send?phone=55#{cliente.telefone.to_s.gsub(/\D/, '')}&text=#{msg_niver}"
+              %>
+              <a href="<%= url_niver %>" target="_blank" class="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-2xl font-black text-xs transition-all shadow-md">
+                <span>🎁</span> MANDAR PARABÉNS
+              </a>
+            <% end %>
+
+            <% if pode_resgatar %>
+              <% 
+                msg_fidelidade = URI.encode_www_form_component("Olá #{cliente.nome}! 🧀 Você completou 10 pontos no seu cartão fidelidade d'A Mineirinha! Seu prêmio de 1kg de pão de queijo já está te esperando. Peça agora!")
+                url_fidelidade = "https://api.whatsapp.com/send?phone=55#{cliente.telefone.to_s.gsub(/\D/, '')}&text=#{msg_fidelidade}"
+              %>
+              <a href="<%= url_fidelidade %>" target="_blank" class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-2xl font-black text-xs transition-all shadow-md">
+                <span>⭐</span> NOTIFICAR PRÊMIO
+              </a>
+            <% end %>
+          </div>
+
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

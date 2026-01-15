@@ -1,21 +1,10 @@
-<div 
-  class="fixed inset-0 -z-10 bg-repeat"
-  style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px;"
->
-</div>
+<div class="fixed inset-0 -z-10 bg-repeat" style="background-image: url('<%= asset_path('Background.png') %>'); background-size: 300px;"></div>
 
-<%# 
-   AJUSTE RESPONSIVO DO CARD PRINCIPAL:
-   - Mobile: rounded-[30px]
-   - Desktop: md:rounded-[40px]
-   - Overflow hidden para bordas perfeitas
-%>
-<div class="w-full bg-amber-100 rounded-[30px] md:rounded-[40px] font-sans text-stone-800 min-h-screen pb-10 mt-2 mb-12  shadow-2xl overflow-hidden">
+<div class="w-full bg-amber-100 rounded-[30px] md:rounded-[40px] font-sans text-stone-800 min-h-screen pb-10 mt-2 mb-12 shadow-2xl overflow-hidden">
 
   <%# NAVBAR %>
   <nav class="bg-amber-100 border-b border-stone-200 py-4 px-4 md:px-6 sticky top-0 z-40 rounded-t-[30px] md:rounded-t-[40px]">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
-      
       <%# Logo %>
       <%= link_to root_path, class: "flex items-center gap-2 group hover:opacity-90 transition" do %>
         <%= image_tag 'Mineirinha.png', alt: 'Logo a mineirinha', class: "h-16 md:h-20 transition-all" %>        
@@ -25,113 +14,129 @@
       <%# Menu de Links %>
       <div class="flex flex-wrap justify-center items-center gap-4 md:gap-6 text-sm font-medium">
         <% if user_signed_in? %>
-          
           <% if current_user.try(:is_admin?) %>
               <%= link_to "Gerenciar", "/cozinha", class: "bg-[#32491E] text-white px-4 py-4 rounded-lg hover:bg-white transition font-bold hover:text-stone-900" %>
           <% end %>
-
           <%= link_to carrinho_path, class: "flex items-center gap-2 text-white hover:text-stone-900 transition bg-[#32491E] px-4 py-4 rounded-lg hover:bg-white" do %>
             <span>Carrinho</span>
             <span class="bg-stone-800 text-white text-xs py-0.5 px-2 rounded-full font-bold">
               <%= current_user.cart_item_count rescue 0 %>
             </span>
           <% end %>
-
-          <%= link_to perfil_usuario_path, class: "flex items-center gap-1 text-white hover:text-stone-900 bg-[#32491E] hover:bg-white hover:text-stone-900 p-4 rounded-lg  transition group" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 group-hover:text-white">
+          <%= link_to perfil_usuario_path, class: "flex items-center gap-1 text-white hover:text-stone-900 bg-[#32491E] hover:bg-white hover:text-stone-900 p-4 rounded-lg transition group" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
             </svg>
             <span class="hidden sm:inline">Perfil</span>
           <% end %>
-          
           <div class="h-4 w-px bg-stone-300 hidden sm:block"></div> 
-          
-          <%= button_to "Sair", destroy_user_session_path, method: :delete, class: "p-4 rounded-lg bg-[#32491E] hover:bg-white hover:text-stone-900 text-white hover:text-red-500 transition cursor-pointer border-0 text-xs sm:text-sm font-bold" %>
-          
+          <%= button_to "Sair", destroy_user_session_path, method: :delete, class: "p-4 rounded-lg bg-[#32491E] hover:bg-white hover:text-stone-900 text-white transition cursor-pointer border-0 text-xs sm:text-sm font-bold" %>
         <% else %>
           <%= link_to "Entrar", new_user_session_path, class: "text-white bg-[#32491E] p-4 rounded-xl font-bold" %>
-          <%= link_to "Criar Conta", new_user_registration_path, class: "bg-[#32491E] text-white px-4 py-4 rounded-lg hover:bg-stone-700 transition shadow-md hover:shadow-lg font-bold" %>
+          <%= link_to "Criar Conta", new_user_registration_path, class: "bg-[#32491E] text-white px-4 py-4 rounded-lg hover:bg-stone-700 transition shadow-md font-bold" %>
         <% end %>
       </div>
     </div>
   </nav>
 
-  <main class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-4">
+  <main class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+    <%# --- STATUS DA LOJA --- %>
+    <div class="w-full flex justify-center md:justify-start mb-6">
+      <div class="flex items-center gap-3 bg-white/80 backdrop-blur-md p-3 px-5 rounded-2xl border-2 border-white shadow-sm transition-all">
+        <% if loja_aberta? %>
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          </span>
+          <span class="text-[#32491E] font-black text-[10px] md:text-xs uppercase tracking-widest">
+            Loja Aberta • <span class="text-green-600 font-bold italic">Pedidos Disponíveis</span>
+          </span>
+        <% else %>
+          <span class="h-3 w-3 rounded-full bg-red-400"></span>
+          <span class="text-stone-500 font-black text-[10px] md:text-xs uppercase tracking-widest">
+            Loja Fechada • <span class="text-red-500 font-bold italic">Voltamos em breve</span>
+          </span>
+        <% end %>
+      </div>
+    </div>
 
     <%# Cabeçalho da Seção %>
-    <div class="mb-4 md:mb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-2 border-b border-stone-200 pb-6">
+    <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-stone-200 pb-6">
       <div>
         <h1 class="text-3xl md:text-4xl font-bold text-[#32491E]">Nossos Produtos</h1>
         <p class="text-[#32491E] opacity-80 text-sm md:text-base">Fresquinhos, artesanais e feitos com carinho.</p>
       </div>
       
-      <%# --- ÁREA ADMINISTRATIVA --- %>
-      <%# Agrupamos o botão e o link aqui dentro para alinhar verticalmente e restringir acesso %>
       <% if user_signed_in? && current_user.try(:is_admin?) %>
         <div class="flex flex-col items-end gap-2 w-full md:w-auto mt-4 md:mt-0">
-          
-          <%# Botão Criar %>
-          <%= link_to new_product_path, class: "w-full md:w-auto flex justify-center items-center gap-2 bg-[#32491E] text-white px-6 py-3 md:py-2 rounded-xl shadow-lg shadow-green-900/20 hover:bg-green-900 transition transform active:scale-95" do %>
+          <%= link_to new_product_path, class: "w-full md:w-auto flex justify-center items-center gap-2 bg-[#32491E] text-white px-6 py-3 rounded-xl shadow-lg hover:bg-green-900 transition transform active:scale-95" do %>
             <span class="text-xl font-bold">+</span> <span class="font-bold">Novo Item</span>
           <% end %>
-
-          <%# Link Arquivados (Abaixo do botão) %>
-          <%= link_to produtos_arquivados_path, class: "text-stone-500 hover:text-stone-700 font-bold text-xs md:text-sm underline flex items-center gap-1" do %>
+          <%= link_to produtos_arquivados_path, class: "text-stone-500 hover:text-stone-700 font-bold text-xs underline flex items-center gap-1" do %>
             <span>Ver Arquivados / Indisponíveis</span> <span>🗑️</span>
           <% end %>
-
         </div>
       <% end %>
-      <%# --------------------------- %>
-
     </div>
-
-    
-    <%# Mensagens de Aviso %>
-    <% if notice %>
-      <div class="bg-white border-l-4 border-green-500 text-stone-600 px-4 py-3 rounded-r-lg mb-8 shadow-sm flex items-center gap-3 animate-fade-in-down">
-        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        <span class="font-medium"><%= notice %></span>
-      </div>
-    <% end %>
 
     <%# GRID DE PRODUTOS %>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
       <% @products.each do |product| %>
-        
-        <div class="group bg-white rounded-[2rem] p-3 border border-stone-100 hover:border-[#32491E] shadow-sm hover:shadow-xl transition duration-300 flex flex-col h-full transform hover:-translate-y-1 ">
+        <div class="group bg-white rounded-[2rem] p-3 border border-stone-100 hover:border-[#32491E] shadow-sm hover:shadow-xl transition duration-300 flex flex-col h-full transform hover:-translate-y-1">
           
-          <%# Imagem do Produto %>
-          <div class="relative bg-stone-100 rounded-[1.5rem] overflow-hidden aspect-square mb-4 group-hover:shadow-inner transition">
-            
+          <div class="relative bg-stone-100 rounded-[1.5rem] overflow-hidden aspect-square mb-4">
             <% if product.imagem.attached? %>
-              <%= image_tag product.imagem.variant(resize_to_limit: [400, 400]), class: "object-cover w-full h-full group-hover:scale-110 transition duration-700 ease-in-out", alt: product.nome %>
+              <%= image_tag product.imagem.variant(resize_to_limit: [400, 400]), class: "object-cover w-full h-full group-hover:scale-110 transition duration-700", alt: product.nome %>
             <% else %>
-              <img src="https://placehold.co/400x400/FFF7ED/CA8A04?text=Sem+Foto" alt="Sem foto" class="object-cover w-full h-full opacity-60 grayscale group-hover:grayscale-0 transition">
+              <img src="https://placehold.co/400x400/FFF7ED/CA8A04?text=Sem+Foto" class="object-cover w-full h-full opacity-60 grayscale">
             <% end %>
 
-            <%# Preço Flutuante %>
             <div class="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl shadow-lg border border-stone-100">
               <span class="text-sm font-extrabold text-stone-900"><%= number_to_currency(product.preco) %></span>
             </div>
-
-            <%# Selo de Pontos %>
-            <% if product.respond_to?(:gera_pontos?) && product.gera_pontos? %>
-               <div class="absolute top-3 left-3 bg-[#32491E] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md z-10 flex items-center gap-1">
-                 <span>★</span> Pontos
-               </div>
-            <% end %>
           </div>
 
-          <%# Informações %>
           <div class="flex-1 flex flex-col px-1">
             <h3 class="font-bold text-lg text-stone-800 mb-1 group-hover:text-[#32491E] transition leading-tight"><%= product.nome %></h3>
             <p class="text-xs text-stone-500 leading-relaxed mb-4 line-clamp-2 min-h-[2.5em]"><%= product.descricao %></p>
             
             <div class="mt-auto pt-4 border-t border-dashed border-stone-100">
-              <%= button_to add_to_cart_path(product.id), method: :post, form: { data: { turbo_confirm: "Você gostaria de levar este #{product.nome} fresquinho para o carrinho?" } } ,class: "w-full py-3 rounded-xl bg-[#32491E] text-white font-bold text-sm hover:bg-[#32491E] transition-all duration-200 shadow-md hover:shadow-lg flex justify-center items-center gap-2 cursor-pointer" do %>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                <span>Adicionar</span>
+              <% if loja_aberta? %>
+                <% if product.is_combo? %>
+                  <%# --- IMPLEMENTAÇÃO DO COMBO DINÂMICO COM FILTRO DE TIPO --- %>
+                  <%= form_with url: add_to_cart_path(product_id: product.id), method: :post, class: "space-y-2" do |f| %>
+                    <%# Passamos o ID do produto para o controller saber qual combo adicionar %>
+                    <%= hidden_field_tag :product_id, product.id %>
+                    <div class="space-y-1">
+                      <p class="text-[9px] font-black text-stone-400 uppercase tracking-widest text-center mb-1">
+                        Sabores <%= product.combo_type %>:
+                      </p>
+                      
+                      <%# FILTRO: Pega apenas produtos que não são combos E que têm o mesmo combo_type deste combo %>
+                      <% sabores_filtrados = @products.select { |p| !p.is_combo? && p.combo_type == product.combo_type } %>
+                      
+                      <% 3.times do |i| %>
+                        <%= f.select "sabores[]", 
+                            options_from_collection_for_select(sabores_filtrados, :nome, :nome), 
+                            { prompt: "Escolha o sabor #{i+1}" }, 
+                            { required: true, class: "w-full py-1.5 px-3 rounded-xl border border-stone-200 text-[11px] font-bold text-stone-700 bg-stone-50 outline-none focus:ring-1 focus:ring-orange-500 transition-all mb-1" } 
+                        %>
+                      <% end %>
+                    </div>
+                    <%= f.submit "ADICIONAR #{product.combo_type&.upcase || 'COMBO'}", class: "w-full py-3 rounded-xl bg-orange-500 text-white font-black text-xs hover:bg-orange-600 transition-all shadow-md cursor-pointer uppercase" %>
+                  <% end %>
+                <% else %>
+                  <%# BOTÃO ADICIONAR NORMAL %>
+                  <%= button_to add_to_cart_path(product_id: product.id), method: :post, form: { data: { turbo_confirm: "Adicionar #{product.nome} ao carrinho?" } }, class: "w-full py-3 rounded-xl bg-[#32491E] text-white font-bold text-sm hover:bg-green-900 transition-all shadow-md hover:shadow-lg flex justify-center items-center gap-2 cursor-pointer" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    <span>Adicionar</span>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <button disabled class="w-full py-3 rounded-xl bg-stone-200 text-stone-400 font-bold text-sm flex justify-center items-center gap-2 cursor-not-allowed border-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span>Loja Fechada</span>
+                </button>
               <% end %>
 
               <% if user_signed_in? && current_user.try(:is_admin?) %>
@@ -142,24 +147,8 @@
               <% end %>
             </div>
           </div>
-
         </div>
       <% end %>
     </div>
-    
-    <%# Estado Vazio %>
-    <% if @products.empty? %>
-      <div class="text-center py-24 bg-white/50 rounded-[3rem] border-2 border-dashed border-stone-300 mx-auto max-w-lg mt-8">
-        <div class="text-7xl mb-4 opacity-50">🥣</div>
-        <h3 class="text-2xl font-bold text-stone-700">O forno está vazio!</h3>
-        <p class="text-stone-500 mt-2 px-4">Nenhum pão de queijo cadastrado no momento.</p>
-        <% if user_signed_in? && current_user.try(:is_admin?) %>
-           <div class="mt-8">
-             <%= link_to "Assar o Primeiro", new_product_path, class: "bg-orange-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-orange-700 transition" %>
-           </div>
-        <% end %>
-      </div>
-    <% end %>
-
   </main>
 </div>

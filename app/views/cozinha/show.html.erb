@@ -9,7 +9,6 @@
 
   <%# --- CABEÇALHO --- %>
   <header class="sticky top-0 left-0 right-0 z-50 w-full bg-[#32491E] text-white pt-6 pb-12 px-4 rounded-b-[40px] shadow-2xl transition-all m-0">
-    
     <div class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
       
       <%# Título %>
@@ -35,16 +34,16 @@
           <span>🏪</span> Loja
         <% end %>
 
+        <%= link_to admin_clientes_path, class: "flex-1 md:flex-none px-6 py-3 rounded-xl text-sm font-bold text-green-100 hover:bg-[#32491E] hover:text-white transition flex items-center justify-center gap-2" do %>
+          <span>👥</span> Clientes
+        <% end %>
+
         <%= link_to historico_vendas_path, class: "flex-1 md:flex-none px-6 py-3 rounded-xl text-sm font-bold text-green-100 hover:bg-[#32491E] hover:text-white transition flex items-center justify-center gap-2" do %>
           <span>📈</span> Histórico
         <% end %>
 
-        <%# --- BOTÃO ATUALIZAR (Com ID para o Javascript encontrar) --- %>
         <%= link_to cozinha_path, id: "btn-refresh", class: "flex-1 md:flex-none px-6 py-3 rounded-xl bg-orange-600 text-white font-bold shadow-lg shadow-orange-900/40 hover:bg-orange-500 transition flex items-center justify-center gap-2 relative overflow-hidden" do %>
-          
-          <%# Barra de progresso visual (fundo do botão) %>
           <div id="progress-bar" class="absolute bottom-0 left-0 h-1 bg-white/30 w-full transition-all duration-1000 ease-linear"></div>
-          
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
           <span id="refresh-text">Atualizar</span>
         <% end %>
@@ -52,21 +51,67 @@
     </div>
   </header>
 
+  <%# --- SEÇÃO DE CONTROLE: FILTRO + STATUS DA LOJA --- %>
+  <section class="w-full max-w-7xl mx-auto px-4 md:px-6 mt-6 mb-6 relative z-40">
+    <% admin = User.find_by(is_admin: true) %>
+    <div class="bg-amber-100 rounded-[30px] p-5 shadow-xl border-4 border-white">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+        
+        <%# Lado Esquerdo: Filtro de Horário %>
+        <%= form_with url: cozinha_path, method: :get, local: true, class: "flex flex-col sm:flex-row gap-3 w-full lg:w-auto" do |f| %>
+          <div class="flex items-center gap-3 shrink-0 mr-2">
+            <span class="text-2xl">🔍</span>
+            <h3 class="text-[#32491E] font-black uppercase text-xs tracking-tight">Filtro</h3>
+          </div>
+          <div class="flex-1 sm:w-40">
+            <%= f.datetime_local_field :inicio, value: params[:inicio], class: "w-full py-2 px-3 rounded-xl border-2 border-[#32491E]/10 bg-white text-stone-700 font-bold focus:ring-2 focus:ring-orange-500 outline-none text-xs" %>
+          </div>
+          <div class="flex-1 sm:w-40">
+            <%= f.datetime_local_field :fim, value: params[:fim], class: "w-full py-2 px-3 rounded-xl border-2 border-[#32491E]/10 bg-white text-stone-700 font-bold focus:ring-2 focus:ring-orange-500 outline-none text-xs" %>
+          </div>
+          <%= f.submit "VER", class: "bg-[#32491E] text-white px-4 py-2 rounded-xl font-bold hover:bg-green-900 transition cursor-pointer text-xs" %>
+          <% if params[:inicio].present? %>
+            <%= link_to "LIMPAR", cozinha_path, class: "text-stone-400 p-2 text-[10px] font-bold underline" %>
+          <% end %>
+        <% end %>
+
+        <%# Lado Direito: Controle Global da Loja %>
+        <div class="flex items-center gap-4 bg-white/50 p-3 rounded-[20px] border-2 border-white/50 w-full lg:w-auto justify-between lg:justify-start">
+          <div class="flex items-center gap-3">
+            <div class="relative flex h-3 w-3">
+              <span class="<%= admin&.loja_aberta_manual ? 'animate-ping bg-green-400' : 'bg-red-400' %> absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 <%= admin&.loja_aberta_manual ? 'bg-green-500' : 'bg-red-500' %>"></span>
+            </div>
+            <span class="text-[10px] font-black text-[#32491E] uppercase leading-none">Loja <%= admin&.loja_aberta_manual ? 'Aberta' : 'Fechada' %></span>
+          </div>
+
+          <% if admin&.loja_aberta_manual %>
+            <%= button_to alternar_loja_path, method: :patch, data: { turbo: false }, class: "bg-red-600 text-white px-6 py-2 rounded-xl font-bold text-xs hover:bg-red-700 transition shadow-md active:scale-95 border-none cursor-pointer" do %>
+              FECHAR TURNO
+            <% end %>
+          <% else %>
+            <%= button_to alternar_loja_path, method: :patch, data: { turbo: false }, class: "bg-green-600 text-white px-6 py-2 rounded-xl font-bold text-xs hover:bg-green-700 transition shadow-md active:scale-95 border-none cursor-pointer" do %>
+              ABRIR TURNO
+            <% end %>
+          <% end %>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <%# --- CONTEÚDO PRINCIPAL --- %>
-  <main class="w-full max-w-7xl mx-auto px-4 md:px-6 -mt-8 relative z-30">
+  <main class="w-full max-w-7xl mx-auto px-4 md:px-6 mt-6 relative z-30">
     
     <% if @pedidos.empty? %>
-      <div class="bg-white rounded-[40px] p-12 text-center shadow-xl border-4 border-dashed border-stone-200 opacity-80 max-w-2xl mx-auto mt-8">
+      <div class="bg-white rounded-[40px] p-12 text-center shadow-xl border-4 border-dashed border-stone-200 opacity-80 max-w-2xl mx-auto">
         <div class="text-8xl mb-6 opacity-20 grayscale">🔥</div>
         <h2 class="text-3xl font-black text-stone-700 mb-2">Forno Vazio!</h2>
-        <p class="text-stone-500 text-lg">Nenhum pedido na fila. Hora de limpar a bancada!</p>
-        <p class="text-sm text-stone-400 mt-4 animate-pulse">Buscando novos pedidos...</p>
+        <p class="text-stone-500 text-lg">Nenhum pedido na fila para este período.</p>
       </div>
     <% else %>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         <% @pedidos.each do |pedido| %>
-          
           <div class="flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden transform hover:-translate-y-1 transition-all duration-300 relative 
                       <%= 'ring-4 ring-orange-400 ring-offset-4 ring-offset-stone-100' if pedido.status == 'Recebido' %>">
             
@@ -74,9 +119,6 @@
             <div class="px-5 py-3 flex justify-between items-center <%= pedido.status == 'Recebido' ? 'bg-orange-500 text-white' : 'bg-[#32491E] text-white' %>">
               <div class="flex items-center gap-2">
                 <span class="font-mono text-lg font-black">#<%= pedido.id %></span>
-                <% if pedido.status == 'Recebido' %>
-                  <span class="bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider animate-pulse">Novo</span>
-                <% end %>
               </div>
               <div class="flex items-center gap-1 font-bold text-xs bg-black/10 px-2 py-1 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -84,138 +126,66 @@
               </div>
             </div>
 
-            <div class="p-5 flex-1 relative">
-              
-              <%# CLIENTE %>
-              <div class="mb-4 border-b-2 border-dashed border-stone-200 pb-4">
-                 <h3 class="font-bold text-stone-800 text-lg leading-tight">
-                   <%= pedido.user.try(:nome) || "Cliente ##{pedido.user_id}" %>
-                 </h3>
-                 
-                 <div class="flex items-center gap-2 mt-1 text-stone-500 font-medium text-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
-                   <span><%= pedido.user&.telefone.presence || "Sem telefone" %></span>
-                 </div>
-              </div>
+            <div class="p-5 flex-1 relative text-left">
+               <%# CLIENTE E TELEFONE %>
+               <div class="mb-4 border-b-2 border-dashed border-stone-200 pb-4">
+                  <h3 class="font-bold text-stone-800 text-lg leading-tight"><%= pedido.user.try(:nome) || "Cliente ##{pedido.user_id}" %></h3>
+                  <div class="flex items-center gap-2 mt-1 text-stone-500 font-medium text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
+                    <span><%= pedido.user&.telefone.presence || "Sem telefone" %></span>
+                  </div>
+               </div>
 
-              <%# LISTA DE ITENS %>
-              <ul class="space-y-3 mb-6">
-                <% pedido.order_items.each do |item| %>
-                  <li class="flex justify-between items-start text-sm group">
-                    <div class="flex gap-3">
-                      <span class="font-mono font-bold text-[#32491E] text-base w-6 text-right"><%= item.quantidade %>x</span>
-                      <span class="font-medium text-stone-700 group-hover:text-black transition uppercase"><%= item.product.nome %></span>
-                    </div>
-                  </li>
-                <% end %>
-              </ul>
+               <%# LISTA DE ITENS COM DETALHAMENTO DE COMBO %>
+               <ul class="space-y-4 mb-6">
+                 <% pedido.order_items.each do |item| %>
+                   <li class="flex flex-col group">
+                     <div class="flex gap-3 items-center">
+                       <span class="font-mono font-bold text-[#32491E] text-lg w-6 text-right"><%= item.quantidade %>x</span>
+                       <span class="font-black text-stone-700 uppercase tracking-tight"><%= item.product.nome %></span>
+                     </div>
 
-              <%# ENDEREÇO %>
-              <% if pedido.endereco.present? || (pedido.user && pedido.user.endereco.present?) %>
+                     <%# --- DETALHAMENTO DO COMBO PARA A COZINHA --- %>
+                     <% if item.observacoes.present? %>
+                       <div class="ml-9 mt-1 p-3 bg-amber-50 border-l-4 border-orange-400 rounded-r-xl shadow-sm">
+                         <p class="text-[9px] font-black text-orange-800 uppercase tracking-widest mb-1">Montar Combo:</p>
+                         <p class="text-sm font-bold text-stone-800 leading-tight italic">
+                           <%= item.observacoes.split(", ").join(" + ") %>
+                         </p>
+                       </div>
+                     <% end %>
+                   </li>
+                 <% end %>
+               </ul>
+
+               <%# ENDEREÇO (RECUPERADO) %>
+               <% if pedido.endereco.present? || (pedido.user && pedido.user.endereco.present?) %>
                 <div class="bg-orange-50 border border-orange-100 rounded-lg p-3 mb-4 flex gap-3">
                    <div class="text-orange-500 mt-0.5">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                    </div>
                    <div class="text-xs text-stone-600 leading-snug">
-                     <span class="font-bold text-stone-800 block mb-0.5">Entregar em:</span>
+                     <span class="font-bold text-stone-800 block mb-0.5 uppercase tracking-tighter">Entregar em:</span>
                      <%= pedido.endereco.presence || pedido.user.endereco %>
                    </div>
                 </div>
               <% end %>
-              
             </div>
 
             <%# RODAPÉ TICKET %>
             <div class="bg-stone-50 p-4 border-t border-stone-200 relative">
-              
-              <div class="flex justify-between items-center mb-4">
+              <div class="flex justify-between items-center mb-4 text-left px-1">
                 <div class="text-xs text-stone-500 font-bold uppercase">Total</div>
                 <div class="text-xl font-black text-[#32491E]"><%= number_to_currency(pedido.total) %></div>
               </div>
-
-              <div class="flex justify-between">
-                <%# Botão Cancelar %>
-                <%= button_to cancelar_pedido_path(pedido.id), method: :patch, data: { turbo_confirm: "Cancelar?" }, class: "p-4 col-span-1 flex items-center justify-center bg-white border-2 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-500 rounded-xl h-12 transition-colors group", title: "Cancelar" do %>
-                   <div class="flex items-center gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                      <span class="font-bold">Cancelar</span>
-                   </div>
-                <% end %>
-
-                <%# Botão Concluir %>
-                <%= button_to concluir_pedido_path(pedido.id), method: :patch, class: "p-4 col-span-2 bg-[#32491E] hover:bg-green-900 text-white font-bold rounded-xl h-12 flex items-center justify-center gap-2 shadow-lg hover:shadow-green-900/30 transition-all active:scale-95" do %>
-                  <span>Concluir</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" /></svg>
-                <% end %>
+              <div class="flex justify-between gap-2">
+                <%= button_to cancelar_pedido_path(pedido.id), method: :patch, data: { turbo_confirm: "Cancelar?" }, class: "flex-1 bg-white border-2 border-red-100 text-red-500 rounded-xl h-10 font-bold text-xs cursor-pointer" do %>Cancelar<% end %>
+                <%= button_to concluir_pedido_path(pedido.id), method: :patch, class: "flex-[2] bg-[#32491E] text-white font-bold rounded-xl h-10 shadow-lg text-xs cursor-pointer" do %>Concluir<% end %>
               </div>
-              
-              <%# PAGAMENTO %>
-              <% icon = case pedido.tipo_pagamento
-                   when 'Pix' then '💠'
-                   when 'Dinheiro' then '💵'
-                   when /Cartão/ then '💳' 
-                   else '💰' 
-                 end %>
-              
-              <div class="text-center mt-3 pt-2 border-t border-stone-200 border-dashed">
-                 <span class="text-xs font-bold uppercase tracking-wider text-stone-500 flex items-center justify-center gap-2">
-                   <span><%= icon %></span>
-                   <%= pedido.tipo_pagamento.presence || "Pagamento Pendente" %>
-                 </span>
-              </div>
-
             </div>
-
           </div>
         <% end %>
       </div>
     <% end %>
   </main>
 </div>
-
-<%# --- SCRIPT DE AUTO-ATUALIZAÇÃO (POLLING) --- %>
-<script>
-  document.addEventListener("turbo:load", function() {
-    startCountdown();
-  });
-  
-  // Caso não use Turbo, inicia no DOMContentLoaded
-  document.addEventListener("DOMContentLoaded", function() {
-    startCountdown();
-  });
-
-  let timer;
-
-  function startCountdown() {
-    // Evita múltiplos timers se a pessoa navegar rápido
-    if (timer) clearInterval(timer);
-
-    const tempoTotal = 15; // 15 Segundos
-    let tempoRestante = tempoTotal;
-    
-    const btnText = document.getElementById("refresh-text");
-    const progressBar = document.getElementById("progress-bar");
-    
-    if (!btnText) return; // Se não tiver botão, para.
-
-    timer = setInterval(() => {
-      tempoRestante--;
-
-      // Atualiza Texto
-      btnText.innerText = `Atualizando (${tempoRestante}s)`;
-
-      // Atualiza Barra de Progresso (diminui a largura)
-      if (progressBar) {
-        const percentage = (tempoRestante / tempoTotal) * 100;
-        progressBar.style.width = percentage + "%";
-      }
-
-      // Quando chegar em 0, recarrega
-      if (tempoRestante <= 0) {
-        clearInterval(timer);
-        btnText.innerText = "Carregando...";
-        window.location.reload();
-      }
-    }, 1000); // Roda a cada 1 segundo
-  }
-</script>

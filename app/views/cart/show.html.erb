@@ -62,11 +62,21 @@
                     <div class="flex justify-between items-start">
                       <h3 class="font-bold text-[#32491E] text-sm md:text-xl leading-tight mb-1"><%= item.product.nome %></h3>
                       <span class="font-bold text-orange-600 text-xs md:text-lg whitespace-nowrap ml-2">
-                        <%= number_to_currency(item.preco_unitario * item.quantidade) %>
+                        <%= number_to_currency((item.preco_unitario || 0) * item.quantidade) %>
                       </span>
                     </div>
+
+                    <%# --- EXIBIÇÃO DINÂMICA DOS SABORES --- %>
+                    <% if item.observacoes.present? %>
+                      <div class="mt-1 mb-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-orange-50 border border-orange-100 text-[10px] md:text-xs font-black text-orange-700 uppercase tracking-tight">
+                          <span class="text-xs">✨</span> Sabores: <%= item.observacoes %>
+                        </span>
+                      </div>
+                    <% end %>
+
                     <p class="text-[10px] md:text-sm text-stone-400 leading-relaxed line-clamp-2 mt-1">
-                      <%= item.product.descricao.present? ? item.product.descricao : "Delicioso pão de queijo caseiro feito com ingredientes selecionados." %>
+                      <%= item.product.is_combo? ? "Seu combo personalizado de 3 sabores." : (item.product.descricao.present? ? item.product.descricao : "Delicioso pão de queijo caseiro feito com ingredientes selecionados.") %>
                     </p>
                   </div>
                 </div>
@@ -102,7 +112,7 @@
         <% end %>
       </div>
 
-      <%# Área de Checkout %>
+      <%# Área de Checkout permanece idêntica com seus scripts %>
       <% if @order.order_items.any? %>
         <div class="bg-white p-5 md:p-8 border-t border-stone-100">
           <%= form_with url: finalizar_pedido_path, method: :post, local: true, id: "form-finalizar", class: "flex flex-col md:flex-row gap-8 items-start" do |f| %>
@@ -123,7 +133,6 @@
                 <% end %>
               </div>
 
-              <%# Containers Centralizados Mobile %>
               <div class="max-w-md mx-auto md:mx-0 space-y-4">
                 <div id="campo_troco" class="hidden animate-fade-in-down">
                    <div class="bg-green-50 rounded-xl p-4 border border-green-100 flex items-center gap-4 text-left">
@@ -155,7 +164,6 @@
                    </div>
                 </div>
 
-                <%# BLOCO DO PIX CENTRALIZADO %>
                 <div id="info_pix" class="hidden animate-fade-in-down">
                   <div class="bg-white rounded-3xl p-6 border-2 border-amber-200 shadow-inner flex flex-col items-center gap-4 mx-auto md:mx-0">
                     <div class="text-center">
@@ -165,14 +173,14 @@
                     </div>
                     <div class="relative bg-white p-3 rounded-2xl shadow-sm border border-stone-100">
                       <img id="img-qrcode" 
-                           src="https://quickchart.io/qr?text=<%= ERB::Util.url_encode(@order.pix_copia_e_cola) %>&size=250&margin=1" 
+                           src="https://quickchart.io/qr?text=<%= ERB::Util.url_encode(@order.pix_copia_e_cola) rescue "" %>&size=250&margin=1" 
                            class="w-40 h-40 md:w-48 md:h-48 object-contain mx-auto rounded-lg" 
                            alt="QRCode Pix">
                     </div>
                     <div class="w-full space-y-2">
                       <label class="block text-[10px] font-extrabold text-[#32491E] uppercase tracking-widest text-center">Pix Copia e Cola</label>
                       <div class="flex flex-col sm:flex-row items-center gap-2 bg-stone-50 border-2 border-stone-100 rounded-2xl p-1.5 w-full">
-                        <input type="text" id="chave-pix" value="<%= @order.pix_copia_e_cola %>" readonly 
+                        <input type="text" id="chave-pix" value="<%= @order.pix_copia_e_cola rescue "" %>" readonly 
                                class="bg-transparent border-none text-[10px] font-mono text-stone-600 focus:ring-0 flex-1 px-3 w-full text-center sm:text-left truncate">
                         <button type="button" onclick="copiarPix()" class="w-full sm:w-auto bg-[#32491E] text-white px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-green-900 transition shadow-md">
                           COPIAR
@@ -194,8 +202,8 @@
 
               <div class="flex items-center justify-between border-t border-dashed border-stone-200 pt-4 px-2">
                 <span class="text-stone-500 font-medium text-sm md:text-base">Total</span>
-                <span id="valor-total-exibicao" data-valor-original="<%= @order.calculate_base_total %>" class="text-2xl md:text-3xl font-extrabold text-[#32491E]">
-                  <%= number_to_currency(@order.calculate_base_total) %>
+                <span id="valor-total-exibicao" data-valor-original="<%= @order.total %>" class="text-2xl md:text-3xl font-extrabold text-[#32491E]">
+                  <%= number_to_currency(@order.total) %>
                 </span>
               </div>
 
@@ -215,7 +223,6 @@
 </div>
 
 <script>
-  // Esta função precisa estar no objeto 'window' para o 'onchange' do HTML achá-la sempre
 window.atualizarAvisos = function(pagamento) {
   const containers = {
     'Dinheiro': document.getElementById('campo_troco'),
@@ -230,108 +237,67 @@ window.atualizarAvisos = function(pagamento) {
   const valorOriginal = parseFloat(totalElemento.dataset.valorOriginal);
   let valorFinal = valorOriginal;
 
-  // Esconde todos os containers primeiro
   Object.values(containers).forEach(el => el?.classList.add('hidden'));
 
-  // Calcula taxa baseada na seleção
   if (pagamento === 'Cartão de Crédito') {
     valorFinal = valorOriginal * 1.0309;
   } else if (pagamento === 'Cartão de Débito') {
     valorFinal = valorOriginal * 1.0089;
   }
 
-  // Mostra o container selecionado
   if (containers[pagamento]) {
     containers[pagamento].classList.remove('hidden');
   }
 
-  // Limpa o troco se não for dinheiro
-  if (pagamento !== 'Dinheiro') {
-    const inputTroco = document.getElementById('campo_troco')?.querySelector('input');
-    if (inputTroco) inputTroco.value = '';
-  }
-
-  // Atualiza o valor formatado na tela
   totalElemento.innerText = valorFinal.toLocaleString('pt-BR', { 
     style: 'currency', 
     currency: 'BRL' 
   });
+}
 
-  // Se for Pix, garante que o input tenha o valor correto vindo do Model
-  if (pagamento === 'Pix') {
-    const inputChave = document.getElementById("chave-pix");
-    // Aqui usamos o valor gerado pelo servidor que já está no atributo value do HTML
-    // O QRCode já foi gerado no carregamento da página via Ruby
+window.copiarPix = function() {
+  const inputChave = document.getElementById("chave-pix");
+  navigator.clipboard.writeText(inputChave.value).then(() => {
+    alert("Chave Pix copiada!");
+  });
+}
+
+window.confirmarEViaZap = async function() {
+  const form = document.getElementById('form-finalizar');
+  const pagamentoSelecionado = form.querySelector('input[name="tipo_pagamento"]:checked');
+
+  if (!pagamentoSelecionado) {
+    alert("Por favor, selecione uma forma de pagamento.");
+    return;
+  }
+
+  const overlay = document.getElementById('success-overlay');
+  overlay.classList.remove('hidden');
+
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch(form.action, { 
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+        'Accept': 'application/json'
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.url) {
+      setTimeout(() => {
+        window.location.href = data.url;
+      }, 2000);
+    } else {
+      throw new Error("URL do WhatsApp não recebida.");
+    }
+  } catch (error) {
+    overlay.classList.add('hidden');
+    alert("Erro: " + error.message);
   }
 }
-  
-
-  // 2. Função de Copiar a Chave
-  window.copiarPix = function() {
-    const inputChave = document.getElementById("chave-pix");
-    const feedback = document.getElementById("feedback-copia");
-
-    // Copia para a área de transferência
-    navigator.clipboard.writeText(inputChave.value).then(() => {
-      feedback.classList.remove('hidden');
-      setTimeout(() => feedback.classList.add('hidden'), 3000);
-      
-      // Feedback visual no botão também
-      const btn = event.target;
-      const originalText = btn.innerText;
-      btn.innerText = "PRONTO!";
-      btn.classList.replace('bg-sky-600', 'bg-green-600');
-      setTimeout(() => {
-        btn.innerText = originalText;
-        btn.classList.replace('bg-green-600', 'bg-sky-600');
-      }, 2000);
-    });
-  }
-  // Função principal de envio
-  window.confirmarEViaZap = async function() {
-    const form = document.getElementById('form-finalizar');
-    const pagamentoSelecionado = form.querySelector('input[name="tipo_pagamento"]:checked');
-
-    if (!pagamentoSelecionado) {
-      alert("Por favor, selecione uma forma de pagamento.");
-      return;
-    }
-
-    const overlay = document.getElementById('success-overlay');
-    overlay.classList.remove('hidden');
-
-    const formData = new FormData(form);
-
-    try {
-      const response = await fetch(form.action, { 
-        method: 'POST',
-        headers: {
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
-          'Accept': 'application/json'
-        },
-        body: formData
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Erro no servidor");
-      }
-
-      const data = await response.json();
-
-      if (data.url) {
-        // Delay para o usuário ver a animação de sucesso
-        setTimeout(() => {
-          window.location.href = data.url;
-        }, 2000);
-      } else {
-        throw new Error("URL do WhatsApp não recebida.");
-      }
-
-    } catch (error) {
-      console.error("Erro:", error);
-      overlay.classList.add('hidden');
-      alert("Erro: " + error.message);
-    }
-  }
 </script>

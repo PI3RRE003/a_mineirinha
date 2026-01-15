@@ -24,9 +24,10 @@ Rails.application.routes.draw do
 
   # Rota de Cancelamento da COZINHA (Mantivemos o nome original aqui para não quebrar a cozinha)
   patch "cozinha/:id/cancelar", to: "cozinha#cancelar", as: "cancelar_pedido"
-
+  # config/routes.rb
+  patch "/alternar_loja", to: "cozinha#alternar_loja", as: :alternar_loja
   get "vendas", to: "cozinha#vendas", as: "historico_vendas"
-
+  get "/admin/clientes", to: "cozinha#clientes", as: :admin_clientes
   # Perfil Usuario
   get "perfil", to: "profile#show", as: "perfil_usuario"
 

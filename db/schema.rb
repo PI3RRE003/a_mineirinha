@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_143419) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_15_150827) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_143419) do
 
   create_table "order_items", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.text "observacoes"
     t.bigint "order_id", null: false
     t.decimal "preco_unitario", precision: 10, scale: 2
     t.bigint "product_id", null: false
@@ -86,10 +87,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_143419) do
   end
 
   create_table "products", force: :cascade do |t|
+    t.string "combo_type"
     t.datetime "created_at", null: false
     t.text "descricao"
     t.boolean "disponivel"
     t.boolean "gera_pontos"
+    t.boolean "is_combo"
     t.string "nome"
     t.decimal "preco", precision: 10, scale: 2
     t.datetime "updated_at", null: false
@@ -97,10 +100,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_143419) do
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.date "data_nascimento"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.text "endereco"
     t.boolean "is_admin"
+    t.boolean "loja_aberta_manual"
     t.string "nome"
     t.integer "pontos", default: 0
     t.datetime "remember_created_at"
