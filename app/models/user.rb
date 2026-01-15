@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  attr_accessor :login
   has_one :cart, dependent: :destroy
   has_many :orders
 
@@ -12,6 +13,7 @@ class User < ApplicationRecord
 
   # --- AJUSTE TELEFONE: Coloquei minimum também, senão aceita 1 número ---
   validates :telefone, presence: { message: "é obrigatório" }, length: { minimum: 10, maximum: 15, message: "Deve conter DDD + Número (apenas números)" }
+  validates :telefone, presence: true, uniqueness: { case_sensitive: false }
 
   validates :endereco, presence: { message: "é obrigatório" }, length: { maximum: 200, message: "Endereço muito longo!" }
 
@@ -20,6 +22,15 @@ class User < ApplicationRecord
   validate :nova_senha_diferente_da_atual, on: :update
 
   before_validation :limpar_dados
+
+  def self.find_first_by_auth_conditions(warden_conditions)
+    conditions = warden_conditions.dup
+    if (login = conditions.delete(:login))
+      where(conditions.to_h).where([ "lower(telefone) = :value OR lower(email) = :value", { value: login.downcase } ]).first
+    elsif conditions.has_key?(:telefone) || conditions.has_key?(:email)
+      where(conditions.to_h).first
+    end
+  end
 
   def cart_item_count
     # 1. Procura um pedido do usuário que tenha o status 'carrinho'
