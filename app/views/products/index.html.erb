@@ -112,9 +112,14 @@
                         Sabores <%= product.combo_type %>:
                       </p>
                       
-                      <%# FILTRO: Pega apenas produtos que não são combos E que têm o mesmo combo_type deste combo %>
-                      <% sabores_filtrados = @products.select { |p| !p.is_combo? && p.combo_type == product.combo_type } %>
-                      
+                      <%# FILTRO EVOLUÍDO: Verifica se o combo_type do sabor contém o combo_type do Combo Pai %>
+                      <% 
+                        sabores_filtrados = @products.select do |p| 
+                          !p.is_combo? && 
+                          p.combo_type.present? && 
+                          p.combo_type.split(',').map(&:strip).include?(product.combo_type)
+                        end 
+                      %>                      
                       <% 3.times do |i| %>
                         <%= f.select "sabores[]", 
                             options_from_collection_for_select(sabores_filtrados, :nome, :nome), 

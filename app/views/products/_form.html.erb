@@ -83,22 +83,23 @@
     </div>
   </div>
 
-  <%# --- NOVO: TIPO DE COMBO / VÍNCULO DE SABORES --- %>
+  <%# TIPO DE COMBO / MÚLTIPLOS VÍNCULOS %>
   <div class="mt-4 mb-8 bg-stone-50 p-4 rounded-xl border-2 border-dashed border-stone-300">
-    <%= form.label :combo_type, "Tipo do Combo / Grupo de Sabores", class: "block font-bold text-stone-700 text-sm uppercase mb-2" %>
-    <%= form.select :combo_type, ["Combo 1", "Combo 2", "Especial"], 
-        { include_blank: "Nenhum (Sabor de uso geral)" }, 
+    <%= form.label :combo_type, "Vincular a quais Combos? (Separe por vírgula)", class: "block font-bold text-stone-700 text-sm uppercase mb-2" %>
+    
+    <%= form.text_field :combo_type, 
+        placeholder: "Ex: Combo 1, Combo 2", 
         class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-[#32491E] focus:ring-[#32491E] text-sm py-2 px-3 bg-white" 
     %>
+
     <div class="mt-3 flex gap-2 items-start">
       <span class="text-lg">💡</span>
       <p class="text-[10px] text-stone-500 font-medium leading-relaxed">
-        <strong class="text-stone-700">Se for Combo:</strong> Só mostrará sabores que tenham o mesmo nome aqui.<br>
-        <strong class="text-stone-700">Se for Sabor:</strong> Só aparecerá dentro de combos com o mesmo nome.
+        Para que um sabor apareça em vários combos, escreva os nomes separados por vírgula.<br>
+        <strong class="text-stone-700 font-bold">Exemplo:</strong> Se você escrever <code class="bg-stone-200 px-1">Combo 1, Combo 2</code>, este sabor aparecerá em ambos.
       </p>
     </div>
   </div>
-
   <div class="inline">
     <%= form.submit "Salvar Produto", class: "w-full sm:w-auto rounded-md px-4 py-2.5 bg-[#32491E] hover:bg-amber-100 text-amber-100 hover:text-[#32491E] font-bold tracking-wide shadow-sm hover:shadow-md cursor-pointer transition-all duration-200" %>
   </div>
